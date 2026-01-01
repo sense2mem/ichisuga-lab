@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>今日のおみくじ</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kiwi+Maru:wght@500&family=Zen+Maru+Gothic:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <main class="container">
+        <h1>今日の御神籤</h1>
+        <button id="draw-button">御籤を引く</button>
+        <div id="result">
+            <div class="scroll-content-wrapper">
+                <div class="scroll-content">
+                    <!-- Fortune content will be injected here -->
+                </div>
+            </div>
+        </div>
+    </main>
+    <script src="script.js"></script>
+
+    <!-- Animation Elements -->
+    <div id="animation-container" class="hidden">
+        <div id="omikuji-box">
+            <div id="omikuji-stick"></div>
+            <span class="fortune-char">おみくじ</span>
+        </div>
+    </div>
+</body>
+</html>
