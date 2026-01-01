@@ -1,0 +1,1215 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>いちすが研究所</title>
+  <meta name="description" content="3Dロゴ×フルスクリーン動画×パララックス×プレイアフル。" />
+  <meta name="theme-color" content="#070a14" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet" />
+
+  <style>
+    :root{
+      --bg0:#070a14;
+      --bg1:#0b1026;
+      --bg2:#111a3a;
+
+      --text:#eaf0ff;
+      --muted:rgba(234,240,255,.74);
+
+      --glass:rgba(255,255,255,.06);
+      --line:rgba(255,255,255,.14);
+
+      --a1:#50c8ff;
+      --a2:#a855f7;
+      --a3:#22c55e;
+
+      --shadow: 0 26px 96px rgba(0,0,0,.58);
+      --radius: 18px;
+      --inner: 1180px;
+
+      --mx: 50%;
+      --my: 50%;
+    }
+
+    *{box-sizing:border-box;}
+    html{scroll-behavior:smooth;}
+    body{
+      margin:0;
+      font-family:"Noto Sans JP", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      line-height:1.75;
+      color:var(--text);
+      background:
+        radial-gradient(1200px 900px at 15% 10%, rgba(168,85,247,.18), transparent 55%),
+        radial-gradient(1100px 800px at 85% 15%, rgba(80,200,255,.18), transparent 55%),
+        radial-gradient(1200px 900px at 50% 110%, rgba(34,197,94,.12), transparent 55%),
+        linear-gradient(180deg, var(--bg0), var(--bg1) 40%, var(--bg2));
+      overflow-x:hidden;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    a{color:var(--a1); text-decoration:none;}
+    a:hover{text-decoration:underline;}
+    a:focus-visible, button:focus-visible{
+      outline:3px solid rgba(80,200,255,.45);
+      outline-offset:3px;
+      border-radius:10px;
+    }
+
+    .skip-link{
+      position:absolute; left:-999px; top:12px;
+      background:#111827; color:#fff;
+      padding:10px 12px; border-radius:10px; z-index:9999;
+    }
+    .skip-link:focus{left:12px;}
+
+    /* フルブリード */
+    .full{
+      width: 100vw;
+      margin-left: calc(50% - 50vw);
+      margin-right: calc(50% - 50vw);
+      position: relative;
+    }
+    .inner{
+      max-width: var(--inner);
+      margin: 0 auto;
+      padding: 0 18px;
+      position: relative;
+      z-index: 7;
+    }
+
+    /* ---------------- HERO ---------------- */
+    .hero{
+      position:relative;
+      min-height: 860px;
+      overflow:hidden;
+      box-shadow: var(--shadow);
+      isolation:isolate;
+      border-bottom: 1px solid rgba(255,255,255,.10);
+    }
+
+    /* ✅ フルスクリーン動画 */
+/* ✅ フルスクリーン動画 */
+.bg-video{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  z-index:0;
+
+  /* ここは元の見た目（常時適用） */
+  transform: scale(1.06) translate3d(0,0,0);
+  filter: saturate(1.2) contrast(1.08) brightness(.92);
+  will-change: transform;
+
+  /* フェードインだけ制御 */
+  opacity: 0;
+  transition: opacity .45s ease;
+}
+
+.bg-video.is-ready{
+  opacity: .92;
+}
+
+/* ✅ HERO中央ロゴ（画像） */
+.heroLogo{
+  position:absolute;
+  left:50%;
+  top:52%;
+  transform: translate(-50%,-50%);
+  width: min(920px, 92vw);
+  height:auto;
+  z-index:4;                 /* scanlines(5)より下、前面FXより上にしたい */
+  pointer-events:none;
+  user-select:none;
+  filter:
+    drop-shadow(0 20px 80px rgba(0,0,0,.55))
+    drop-shadow(0 0 28px rgba(80,200,255,.25));
+}
+  
+  /* 動画の上に“センセーショナル”な色味 */
+    .video-tint{
+      position:absolute; inset:0; z-index:1;
+      background:
+        radial-gradient(1000px 700px at 18% 12%, rgba(80,200,255,.22), transparent 55%),
+        radial-gradient(900px 650px at 85% 18%, rgba(168,85,247,.22), transparent 55%),
+        radial-gradient(900px 650px at 40% 110%, rgba(34,197,94,.14), transparent 60%),
+        linear-gradient(180deg, rgba(7,10,20,.22), rgba(7,10,20,.60));
+      mix-blend-mode: screen;
+      pointer-events:none;
+    }
+
+    /* 3D canvas */
+    #scene{
+      position:absolute; inset:0;
+      width:100%; height:100%;
+      display:block;
+      z-index:3;
+      opacity:.99;
+    }
+
+    /* パララックス：背面＆前面 */
+    .fx-layer{
+      position:absolute;
+      inset:-25%;
+      pointer-events:none;
+      transform: translate3d(0,0,0);
+      will-change: transform;
+    }
+    .fx-back{ z-index:2; opacity:.85; }
+    .fx-front{ z-index:4; opacity:.80; mix-blend-mode: screen; }
+
+    .blob{
+      position:absolute; border-radius:999px;
+      mix-blend-mode: screen;
+      filter: blur(26px);
+      opacity:.58;
+      transform: translate3d(0,0,0);
+      will-change: transform;
+    }
+    .blob.b1{width:640px;height:640px; left:-200px; top:-200px; background: radial-gradient(circle at 30% 30%, rgba(80,200,255,.92), transparent 60%);}
+    .blob.b2{width:580px;height:580px; right:-230px; top: 30px; background: radial-gradient(circle at 60% 40%, rgba(168,85,247,.92), transparent 60%);}
+    .blob.b3{width:760px;height:760px; left: 25%; bottom:-450px; background: radial-gradient(circle at 40% 60%, rgba(34,197,94,.80), transparent 60%);}
+
+    .gridlines{
+      position:absolute; inset:-30%;
+      background:
+        linear-gradient(rgba(255,255,255,.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.07) 1px, transparent 1px);
+      background-size: 72px 72px;
+      transform: rotate(10deg);
+      opacity:.12;
+      mask-image: radial-gradient(closest-side at 55% 40%, rgba(0,0,0,.9), transparent 72%);
+      -webkit-mask-image: radial-gradient(closest-side at 55% 40%, rgba(0,0,0,.9), transparent 72%);
+      will-change: transform;
+    }
+
+    .streak{
+      position:absolute;
+      width: 2000px; height: 2px;
+      left:-40%;
+      top: 56%;
+      background: linear-gradient(90deg, transparent, rgba(80,200,255,.80), rgba(168,85,247,.80), transparent);
+      transform: rotate(-12deg);
+      opacity:.55;
+      filter: drop-shadow(0 0 22px rgba(80,200,255,.60));
+      will-change: transform;
+    }
+
+    .spark{
+      position:absolute; width: 10px; height: 10px; border-radius: 999px;
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.98), rgba(80,200,255,.70) 45%, transparent 70%);
+      filter: blur(.2px) drop-shadow(0 0 18px rgba(80,200,255,.56));
+      opacity: .74;
+      will-change: transform;
+    }
+    .spark.s1{ left: 16%; top: 20%; }
+    .spark.s2{ left: 62%; top: 26%; width: 14px; height: 14px; opacity:.60; }
+    .spark.s3{ left: 80%; top: 52%; width: 9px; height: 9px; opacity:.60; }
+    .spark.s4{ left: 40%; top: 66%; width: 12px; height: 12px; opacity:.50; }
+
+/* パララックスは transform を直接上書きせず、変数で渡す */
+[data-parallax]{ --px:0px; --py:0px; transform: translate3d(var(--px), var(--py), 0); }
+
+/* 回転が必要なものは「translate + rotate」にする */
+.gridlines{ transform: translate3d(var(--px), var(--py), 0) rotate(10deg); }
+.streak{   transform: translate3d(var(--px), var(--py), 0) rotate(-12deg); }
+
+
+
+    /* スキャンライン（センセーショナル） */
+    .scanlines{
+      position:absolute; inset:0;
+      z-index:5;
+      pointer-events:none;
+      background: repeating-linear-gradient(
+        to bottom,
+        rgba(255,255,255,.045),
+        rgba(255,255,255,.045) 1px,
+        transparent 1px,
+        transparent 5px
+      );
+      opacity:.10;
+      mix-blend-mode: overlay;
+      transform: translate3d(0,0,0);
+    }
+
+    /* HEROの暗幕（読みやすさ） */
+    .heroShade{
+      position:absolute; inset:0;
+      z-index:6;
+      pointer-events:none;
+      background:
+        radial-gradient(1200px 860px at 60% 35%, rgba(0,0,0,.06), rgba(0,0,0,.64));
+    }
+
+    /* ✅ 左上固定のブランドブロック（ご要望） */
+    .brandTopLeft{
+      position:absolute;
+      top: 16px;
+      left: 16px;
+      z-index: 8;
+      max-width: min(620px, calc(100vw - 32px));
+      padding: 14px 14px 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.16);
+      background: rgba(0,0,0,.26);
+      backdrop-filter: blur(14px);
+      box-shadow: 0 22px 80px rgba(0,0,0,.36);
+      overflow:hidden;
+    }
+    .brandTopLeft::before{
+      content:"";
+      position:absolute; inset:-2px;
+      background: radial-gradient(520px 260px at var(--mx,50%) var(--my,50%),
+        rgba(80,200,255,.26), rgba(168,85,247,.22), rgba(34,197,94,.14), transparent 60%);
+      opacity: .95;
+      pointer-events:none;
+    }
+    .brandTitle{
+      position:relative;
+      margin:0;
+      font-size: 18px;
+      letter-spacing:.08em;
+      text-transform: none;
+    }
+    .brandTagline{
+      position:relative;
+      margin: 6px 0 0;
+      font-weight:700;
+      font-size: clamp(18px, 2.0vw, 26px);
+      line-height: 1.18;
+      letter-spacing:.01em;
+      text-shadow: 0 12px 28px rgba(0,0,0,.55);
+    }
+    .brandDesc{
+      position:relative;
+      margin: 8px 0 0;
+      color: rgba(234,240,255,.86);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    /* “グリッチっぽい”センセーショナル演出（軽量） */
+    .glitch{
+      position:relative;
+      display:inline-block;
+      filter: drop-shadow(0 0 18px rgba(80,200,255,.25));
+    }
+    .glitch::before,
+    .glitch::after{
+      content: attr(data-text);
+      position:absolute;
+      left:0; top:0;
+      width:100%;
+      opacity:.55;
+      pointer-events:none;
+      mix-blend-mode: screen;
+    }
+    .glitch::before{
+      transform: translate3d(1px,0,0);
+      color: rgba(80,200,255,.85);
+      clip-path: inset(0 0 52% 0);
+      animation: glitch1 2.6s infinite linear;
+    }
+    .glitch::after{
+      transform: translate3d(-1px,0,0);
+      color: rgba(168,85,247,.85);
+      clip-path: inset(48% 0 0 0);
+      animation: glitch2 3.1s infinite linear;
+    }
+    @keyframes glitch1{
+      0%, 100%{ clip-path: inset(0 0 52% 0); }
+      12%{ clip-path: inset(0 0 62% 0); }
+      18%{ clip-path: inset(0 0 48% 0); }
+      42%{ clip-path: inset(0 0 58% 0); }
+      65%{ clip-path: inset(0 0 46% 0); }
+    }
+    @keyframes glitch2{
+      0%, 100%{ clip-path: inset(48% 0 0 0); }
+      10%{ clip-path: inset(56% 0 0 0); }
+      28%{ clip-path: inset(44% 0 0 0); }
+      49%{ clip-path: inset(60% 0 0 0); }
+      72%{ clip-path: inset(46% 0 0 0); }
+    }
+
+/* ✅ ステッカー：ドラッグ可能にする（重要） */
+/* ✅ 空白は透過、ステッカーだけ掴める */
+.stickers{
+  position:absolute;
+  inset:0;
+  z-index:9;
+  pointer-events:none;   /* ←空白を透過 */
+}
+.sticker{
+  pointer-events:auto;   /* ←ステッカーだけ反応 */
+  position:absolute;
+
+  /* 見た目（元の“ステッカー感”）も復活させる */
+  display:inline-flex;
+  gap:10px;
+  align-items:center;
+  padding: 10px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.14);
+  background: rgba(255,255,255,.06);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 20px 70px rgba(0,0,0,.30);
+  color: rgba(234,240,255,.92);
+  font-size: 12px;
+  letter-spacing:.05em;
+  opacity:.95;
+
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+}
+.sticker:active{ cursor: grabbing; }
+.sticker.dragging{ z-index: 9999; }
+
+/* ✅ 左上ブランドと被らない “安全な上余白” を使う */
+:root{ --safeTop: 150px; }
+
+/* ✅ 初期配置（a/b/c/d が効いてないと全部左上に被ります） */
+.sticker.a{ left: 18px;  top: var(--safeTop); }
+.sticker.b{ right: 18px; top: var(--safeTop); }
+.sticker.c{ left: 18px;  bottom: 22px; }
+.sticker.d{ right: 18px; bottom: 22px; }
+
+    /* 下部UI（CTA） */
+    .heroWrap{
+      min-height: 860px;
+      display:grid;
+      align-items:end;
+      position: relative;
+      padding: 72px 0 36px;
+      z-index: 7;
+    }
+
+    .heroContent{
+      position:relative;
+      max-width: 980px;
+      padding: 16px 16px 16px;
+      border-radius: calc(var(--radius) + 10px);
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.05);
+      backdrop-filter: blur(14px);
+      box-shadow: 0 26px 90px rgba(0,0,0,.38);
+      overflow:hidden;
+    }
+    .heroContent::before{
+      content:"";
+      position:absolute; inset:-2px;
+      background: radial-gradient(760px 380px at var(--mx,50%) var(--my,50%),
+        rgba(80,200,255,.22), rgba(168,85,247,.18), rgba(34,197,94,.12), transparent 62%);
+      opacity:.95;
+      pointer-events:none;
+    }
+
+    .kicker{
+      position:relative;
+      display:inline-flex; gap:10px; align-items:center;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.16);
+      background: rgba(0,0,0,.20);
+      color: rgba(234,240,255,.92);
+      font-size: 12px;
+      letter-spacing:.10em;
+      text-transform: uppercase;
+      width: fit-content;
+      box-shadow: 0 12px 30px rgba(0,0,0,.22);
+    }
+    .dot{
+      width:8px;height:8px;border-radius:999px;
+      background: radial-gradient(circle at 30% 30%, #fff, var(--a1));
+      box-shadow: 0 0 14px rgba(80,200,255,.65);
+    }
+
+    .heroCTA{
+      position:relative;
+      margin-top: 12px;
+      display:flex; gap:12px; flex-wrap:wrap;
+      align-items:center;
+    }
+
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center;
+      padding: 12px 16px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.16);
+      background: rgba(255,255,255,.08);
+      color: var(--text);
+      box-shadow: 0 18px 40px rgba(0,0,0,.25);
+      backdrop-filter: blur(12px);
+      transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+      will-change: transform;
+      font-weight:700;
+      position:relative;
+      overflow:hidden;
+    }
+    .btn::before{
+      content:"";
+      position:absolute; inset:-2px;
+      background: radial-gradient(240px 140px at var(--mx,50%) var(--my,50%),
+        rgba(80,200,255,.25), rgba(168,85,247,.20), transparent 60%);
+      opacity:0;
+      transition: opacity .15s ease;
+      pointer-events:none;
+    }
+    .btn:hover::before{opacity:1;}
+    .btn:hover{
+      transform: translateY(-2px);
+      background: rgba(255,255,255,.10);
+      box-shadow: 0 22px 70px rgba(0,0,0,.38);
+    }
+    .btn.primary{
+      border-color: rgba(80,200,255,.38);
+      background: linear-gradient(135deg, rgba(80,200,255,.22), rgba(168,85,247,.18));
+    }
+    .btn .mini{opacity:.8; font-weight:400; margin-left:8px; font-size:12px;}
+
+    .hint{
+      position:relative;
+      color: rgba(234,240,255,.66);
+      font-size: 12px;
+      letter-spacing:.06em;
+    }
+
+/* ✅ 「概要」セクションの背面に画像を敷く */
+#about{
+  position: relative;
+  overflow: hidden;      /* はみ出し防止（既に .section にあるが念のため） */
+}
+
+/* 背景画像レイヤ */
+#about::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background-image: url("https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=1600&q=60");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  opacity: .18;          /* ←濃さはここで調整 */
+  filter: saturate(1.1) contrast(1.1) brightness(.75);
+  transform: scale(1.06); /* 端のチラつき対策 */
+  z-index: 0;
+}
+
+/* 文字・カードを背景より前に出す */
+#about .inner{
+  position: relative;
+  z-index: 1;
+}
+
+
+
+
+
+
+    /* ---------------- Sections ---------------- */
+    .section{
+      padding: 54px 0;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      position:relative;
+      overflow:hidden;
+    }
+    .section.alt{
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.00));
+    }
+    .secHead{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap: 16px;
+      flex-wrap:wrap;
+      margin-bottom: 18px;
+    }
+    .secHead h2{
+      margin:0;
+      font-size: clamp(22px, 2.6vw, 30px);
+      letter-spacing:.02em;
+    }
+    .secHead p{
+      margin:0;
+      color: var(--muted);
+      max-width: 760px;
+    }
+
+    .aboutGrid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+      margin-top: 14px;
+    }
+    @media (min-width: 980px){
+      .aboutGrid{grid-template-columns: 1.1fr .9fr;}
+    }
+
+    .panel{
+      background: var(--glass);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: 0 18px 60px rgba(0,0,0,.26);
+      backdrop-filter: blur(14px);
+      position:relative;
+      overflow:hidden;
+      will-change: transform;
+    }
+    .panel::before{
+      content:"";
+      position:absolute; inset:-2px;
+      background: radial-gradient(650px 340px at var(--mx,50%) var(--my,50%),
+        rgba(80,200,255,.18), rgba(168,85,247,.14), transparent 60%);
+      opacity:.85;
+      pointer-events:none;
+    }
+    .panel h3{margin:0 0 10px; font-size: 16px; letter-spacing:.02em; position:relative;}
+    .panel p, .panel ul{position:relative;}
+    .panel ul{margin: 10px 0 0; padding-left: 18px; color: var(--muted);}
+
+    .themes{
+      margin-top: 16px;
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+    @media (min-width: 860px){
+      .themes{grid-template-columns: 1fr 1fr 1fr;}
+    }
+
+    .tilt{
+      position:relative;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      padding: 18px;
+      transform-style: preserve-3d;
+      will-change: transform;
+      transition: transform .18s ease, box-shadow .18s ease;
+      overflow:hidden;
+      min-height: 170px;
+    }
+    .tilt::before{
+      content:"";
+      position:absolute; inset:-2px;
+      background: radial-gradient(560px 320px at var(--mx,50%) var(--my,50%),
+        rgba(80,200,255,.22), rgba(168,85,247,.18), rgba(34,197,94,.10), transparent 65%);
+      opacity:.95;
+      pointer-events:none;
+      transform: translateZ(-1px);
+    }
+    .tilt:hover{box-shadow: 0 28px 90px rgba(0,0,0,.40);}
+    .tilt h4{margin:0 0 10px; font-size: 18px; transform: translateZ(18px); letter-spacing:.02em;}
+    .tilt p{margin:0; color: var(--muted); font-size: 14px; line-height:1.7; transform: translateZ(14px);}
+
+    footer{
+      padding: 26px 0 36px;
+      text-align:center;
+      color: rgba(234,240,255,.55);
+      font-size: 13px;
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      html{scroll-behavior:auto;}
+      #scene{display:none;}
+      .bg-video{display:none;}
+      .fx-layer,.stickers,.scanlines{display:none;}
+      .tilt, .panel, .btn{transition:none !important; transform:none !important;}
+    }
+  </style>
+</head>
+
+<body>
+  <a class="skip-link" href="#content">本文へスキップ</a>
+
+  <header class="hero full" id="hero" role="banner">
+    <!-- ✅ フルスクリーン動画（ここが見えるようになります） -->
+    <video class="bg-video" autoplay muted playsinline loop preload="metadata"
+      poster="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=1600&q=60">
+      <!-- 好きな動画URLに差し替えOK -->
+      <source src="https://assets.mixkit.co/videos/preview/mixkit-digital-animation-of-a-colorful-wavy-background-47783-large.mp4" type="video/mp4">
+    </video>
+    <div class="video-tint" aria-hidden="true"></div>
+
+    <!-- 背面パララックス -->
+    <div class="fx-layer fx-back" data-parallax data-speed="0.18" data-mouse="0.35" aria-hidden="true">
+      <div class="blob b1" data-parallax data-speed="0.14" data-mouse="0.55"></div>
+      <div class="blob b2" data-parallax data-speed="0.12" data-mouse="0.48"></div>
+      <div class="blob b3" data-parallax data-speed="0.10" data-mouse="0.40"></div>
+      <div class="gridlines" data-parallax data-speed="0.08" data-mouse="0.35"></div>
+    </div>
+
+    <!-- 3D -->
+    <canvas id="scene" aria-hidden="true"></canvas>
+
+<!-- ✅ ロゴ画像を重ねる -->
+<img class="heroLogo" src="./ichisuga-lab.png" alt="ICHISUGA LAB">
+
+
+
+    <!-- 前面パララックス -->
+    <div class="fx-layer fx-front" data-parallax data-speed="0.10" data-mouse="0.78" aria-hidden="true">
+      <div class="streak" data-parallax data-speed="0.16" data-mouse="0.75"></div>
+      <div class="spark s1" data-parallax data-speed="0.12" data-mouse="0.95"></div>
+      <div class="spark s2" data-parallax data-speed="0.10" data-mouse="0.88"></div>
+      <div class="spark s3" data-parallax data-speed="0.14" data-mouse="1.00"></div>
+      <div class="spark s4" data-parallax data-speed="0.09" data-mouse="0.85"></div>
+    </div>
+
+    <div class="scanlines" aria-hidden="true"></div>
+    <div class="heroShade" aria-hidden="true"></div>
+
+    <!-- ✅ 左上に固定配置（ご指定文言） -->
+    <div class="brandTopLeft" id="brandTL" aria-label="サイト見出し">
+      <h1 class="brandTitle">いちすが研究所</h1>
+      <div class="brandTagline">
+        <span class="glitch" data-text="触れることで、すべては語り始める。">触れることで、すべては語り始める。</span>
+      </div>
+      <p class="brandDesc">IT基盤・運用改善・自動化を軸に、言葉と身体の領域へ。</p>
+    </div>
+
+    <!-- ステッカー（遊び） -->
+    <div class="stickers" aria-hidden="true">
+      <div class="sticker a" data-parallax data-speed="0.12" data-mouse="1.10"><span class="emo">⚡</span> Automation</div>
+      <div class="sticker b" data-parallax data-speed="0.10" data-mouse="1.00"><span class="emo">🧠</span> Structure</div>
+      <div class="sticker c" data-parallax data-speed="0.14" data-mouse="1.20"><span class="emo">🛡️</span> Security</div>
+      <div class="sticker d" data-parallax data-speed="0.11" data-mouse="1.05"><span class="emo">✨</span> Playful</div>
+    </div>
+
+    <!-- 下部CTA（プレイアフルな操作・クリック波紋あり） -->
+    <div class="inner heroWrap">
+      <div class="heroContent" id="heroCard">
+          <div class="kicker"><span class="dot"></span> Touch It, It Talks — From Chaos to Clarity</div>
+　　　　　<div class="heroCTA">
+          <a class="btn primary magnetic" href="#about">概要を見る <span class="mini">full width</span></a>
+	　<a class="btn magnetic" href="#themes">相談テーマ <span class="mini">3 cards</span></a>
+	　<span class="hint">ヒント：HEROをクリック/タップ → 光の波</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main id="content">
+    <section id="about" class="section full">
+      <div class="inner">
+        <div class="secHead">
+          <h2>概要</h2>
+          <p>最小構成で運用しつつ、必要なときだけ更新する「軽量トップ」。作り直し前提の“土台”として設計。</p>
+        </div>
+        <div class="aboutGrid">
+          <div class="panel" data-tilt>
+            <h3>スタンス</h3>
+            <p>難しい言葉は減らして、構造をほどく。まずは“必要な最小”を作り、後から育てる。</p>
+          </div>
+          <div class="panel" data-tilt>
+            <h3>リンク</h3>
+            <ul>
+              <li><a href="https://github.com/" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+              <li><a href="https://x.com/" target="_blank" rel="noopener noreferrer">SNS（X）</a></li>
+            </ul>
+            <h3 style="margin-top:16px;">連絡</h3>
+            <p>フォームは置かず、必要な導線だけ（SNSのDM／メール等）に絞ります。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="themes" class="section full alt">
+      <div class="inner">
+        <div class="secHead">
+          <h2>相談テーマ</h2>
+          <p>“トップ1枚”から、必要に応じて拡張。フル幅で世界観と強みを押し出します。</p>
+        </div>
+        <div class="themes" role="list">
+          <article class="tilt" role="listitem" data-tilt>
+            <h4>Design</h4>
+            <p>言語化が難しいものを、図と例で“触れる形”へ。合意形成が速くなります。</p>
+          </article>
+          <article class="tilt" role="listitem" data-tilt>
+            <h4>Development</h4>
+            <p>必要なところからシンプルに開始。あとで足せる構造で、運用に耐える形へ。</p>
+          </article>
+          <article class="tilt" role="listitem" data-tilt>
+            <h4>Marketing</h4>
+            <p>専門用語より「どこに出せば届くか」。導線と情報設計を一緒に整えます。</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <footer class="full">
+      <div class="inner">© いちすが研究所</div>
+    </footer>
+  </main>
+
+<script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.159.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.159.0/examples/jsm/"
+    }
+  }
+</script>
+
+
+  <script type="module">
+    import * as THREE from "three";
+    import { RoomEnvironment } from "https://unpkg.com/three@0.159.0/examples/jsm/environments/RoomEnvironment.js";
+    import { EffectComposer } from "https://unpkg.com/three@0.159.0/examples/jsm/postprocessing/EffectComposer.js";
+    import { RenderPass } from "https://unpkg.com/three@0.159.0/examples/jsm/postprocessing/RenderPass.js";
+    import { UnrealBloomPass } from "https://unpkg.com/three@0.159.0/examples/jsm/postprocessing/UnrealBloomPass.js";
+
+    const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const isCoarse = matchMedia("(pointer: coarse)").matches;
+
+    const hero = document.getElementById("hero");
+    const heroCard = document.getElementById("heroCard");
+    const brandTL = document.getElementById("brandTL");
+    const bgVideo = document.querySelector(".bg-video");
+
+if (bgVideo) {
+  const reveal = () => bgVideo.classList.add("is-ready");
+  bgVideo.addEventListener("playing", reveal, { once: true });
+  bgVideo.addEventListener("canplay", reveal, { once: true }); // 保険
+}
+
+
+
+    // ---------- Parallax (scroll + mouse)
+    const parallaxEls = Array.from(document.querySelectorAll("[data-parallax]"));
+    let mouseX = 0, mouseY = 0;
+    let rafPending = false;
+
+    function requestParallax(){
+      if (rafPending) return;
+      rafPending = true;
+      requestAnimationFrame(updateParallax);
+    }
+
+// ✅ 左上ブランドの高さに応じて、ステッカーの開始位置を下げる
+function updateSafeTop(){
+  const brand = document.getElementById("brandTL");
+  const r = brand?.getBoundingClientRect();
+  // ブランド下端 + 16px を安全領域に（上限は適当）
+  const safe = r ? Math.min(360, r.bottom + 16) : 150;
+  document.documentElement.style.setProperty("--safeTop", `${safe}px`);
+}
+updateSafeTop();
+window.addEventListener("resize", updateSafeTop, { passive:true });
+
+// ✅ Draggable Stickers
+const draggableStickers = Array.from(document.querySelectorAll(".sticker"));
+
+function makeStickerDraggable(el){
+  if (!el.dataset.dx) el.dataset.dx = "0";
+  if (!el.dataset.dy) el.dataset.dy = "0";
+
+  let startX = 0, startY = 0;
+  let baseDx = 0, baseDy = 0;
+  let activeId = null;
+
+  const bump = () => (typeof requestParallax === "function" ? requestParallax() : updateParallax());
+
+  el.addEventListener("pointerdown", (e) => {
+    // ステッカーを掴んだ時に、HEROの波紋（pointerdown）を発火させない
+    e.stopPropagation();
+
+    activeId = e.pointerId;
+    el.classList.add("dragging");
+
+    startX = e.clientX;
+    startY = e.clientY;
+    baseDx = parseFloat(el.dataset.dx || "0");
+    baseDy = parseFloat(el.dataset.dy || "0");
+
+    el.setPointerCapture?.(activeId);
+    e.preventDefault();
+  });
+
+  window.addEventListener("pointermove", (e) => {
+    if (activeId === null || e.pointerId !== activeId) return;
+
+    const dx = baseDx + (e.clientX - startX);
+    const dy = baseDy + (e.clientY - startY);
+
+    el.dataset.dx = String(dx);
+    el.dataset.dy = String(dy);
+
+    bump();
+    e.preventDefault();
+  }, { passive:false });
+
+  window.addEventListener("pointerup", (e) => {
+    if (activeId === null || e.pointerId !== activeId) return;
+
+    try { el.releasePointerCapture?.(activeId); } catch {}
+    activeId = null;
+    el.classList.remove("dragging");
+    e.preventDefault();
+  }, { passive:false });
+}
+
+if (!reduceMotion) draggableStickers.forEach(makeStickerDraggable);
+    
+
+
+
+function updateParallax(){
+      rafPending = false;
+      const y = window.scrollY || 0;
+      const mx = mouseX, my = mouseY;
+
+      for (const el of parallaxEls) {
+  // ✅ ドラッグ中のステッカーはパララックスをスキップ
+  if (el.classList.contains("dragging")) continue;
+
+  const s = parseFloat(el.dataset.speed || "0.2");
+  const m = parseFloat(el.dataset.mouse || "0.0");
+  const ty = y * s * -0.12;
+  const txm = mx * 30 * m;
+  const tym = my * 22 * m;
+  const dx = parseFloat(el.dataset.dx || "0");
+  const dy = parseFloat(el.dataset.dy || "0");
+
+  el.style.setProperty("--px", `${txm + dx}px`);
+  el.style.setProperty("--py", `${ty + tym + dy}px`);
+}
+      // 左上ブランド・カードの光源位置
+      const mxp = `${(mx + 0.5) * 100}%`;
+      const myp = `${(my + 0.5) * 100}%`;
+      brandTL?.style.setProperty("--mx", mxp);
+      brandTL?.style.setProperty("--my", myp);
+      heroCard?.style.setProperty("--mx", mxp);
+      heroCard?.style.setProperty("--my", myp);
+
+      // ✅ 動画も“プレイアフル”に：ゆっくりズーム＋マウスで微移動
+      if (bgVideo && !reduceMotion) {
+        const vtx = mx * -14;
+        const vty = my * -10 + y * -0.005;
+        bgVideo.style.transform = `scale(1.08) translate3d(${vtx}px, ${vty}px, 0)`;
+      }
+    }
+
+    window.addEventListener("scroll", requestParallax, { passive:true });
+
+    if (hero && !reduceMotion) {
+      hero.addEventListener("pointermove", (e) => {
+        const r = hero.getBoundingClientRect();
+        const x = (e.clientX - r.left) / r.width;
+        const y = (e.clientY - r.top) / r.height;
+        mouseX = (x - 0.5);
+        mouseY = (y - 0.5);
+        requestParallax();
+      }, { passive:true });
+
+      hero.addEventListener("pointerleave", () => {
+        mouseX = 0; mouseY = 0;
+        requestParallax();
+      }, { passive:true });
+    }
+    updateParallax();
+
+    // ---------- Tilt (cards)
+    const tiltEls = Array.from(document.querySelectorAll("[data-tilt]"));
+    function bindTilt(el){
+      let rect = null;
+      const onEnter = () => rect = el.getBoundingClientRect();
+      const onMove = (e) => {
+        if (!rect) rect = el.getBoundingClientRect();
+        const x = (e.clientX - rect.left) / rect.width;
+        const y = (e.clientY - rect.top) / rect.height;
+
+        const rx = (0.5 - y) * 10;
+        const ry = (x - 0.5) * 14;
+
+        el.style.transform = `perspective(900px) rotateX(${rx}deg) rotateY(${ry}deg) translateY(-2px)`;
+      };
+      const onLeave = () => {
+        rect = null;
+        el.style.transform = "perspective(900px) rotateX(0deg) rotateY(0deg) translateY(0px)";
+      };
+      el.addEventListener("mouseenter", onEnter);
+      el.addEventListener("mousemove", onMove);
+      el.addEventListener("mouseleave", onLeave);
+    }
+    if (!reduceMotion && !isCoarse) tiltEls.forEach(bindTilt);
+
+    // ---------- Magnetic buttons (playful)
+    const magnets = Array.from(document.querySelectorAll(".magnetic"));
+    function bindMagnet(btn){
+      let r = null;
+      const strength = 12;
+      const onEnter = () => { r = btn.getBoundingClientRect(); };
+      const onMove = (e) => {
+        if (!r) r = btn.getBoundingClientRect();
+        const x = (e.clientX - r.left) / r.width - 0.5;
+        const y = (e.clientY - r.top) / r.height - 0.5;
+
+        btn.style.setProperty("--mx", `${(x + 0.5) * 100}%`);
+        btn.style.setProperty("--my", `${(y + 0.5) * 100}%`);
+        btn.style.transform = `translate3d(${x * strength}px, ${y * strength}px, 0)`;
+      };
+      const onLeave = () => {
+        r = null;
+        btn.style.transform = "translate3d(0,0,0)";
+        btn.style.setProperty("--mx", "50%");
+        btn.style.setProperty("--my", "50%");
+      };
+      btn.addEventListener("mouseenter", onEnter);
+      btn.addEventListener("mousemove", onMove);
+      btn.addEventListener("mouseleave", onLeave);
+    }
+    if (!reduceMotion && !isCoarse) magnets.forEach(bindMagnet);
+
+
+
+
+
+    // ---------- Three.js 3D (センセーショナル強化 + クリック波紋)
+    function init3D(){
+      const canvas = document.getElementById("scene");
+      if (!canvas || !hero) return;
+
+      const scene = new THREE.Scene();
+      const renderer = new THREE.WebGLRenderer({
+        canvas, antialias: true, alpha: true, powerPreference: "high-performance"
+      });
+
+      const dprCap = (isCoarse ? 1.4 : 2.0);
+      const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 160);
+      camera.position.set(0, 0.48, 6.3);
+
+      // env
+      const pmrem = new THREE.PMREMGenerator(renderer);
+      const envTex = pmrem.fromScene(new RoomEnvironment(renderer), 0.04).texture;
+      scene.environment = envTex;
+
+      scene.add(new THREE.AmbientLight(0xffffff, 0.10));
+      const key = new THREE.DirectionalLight(0x7dd3fc, 0.75); key.position.set(3.2, 2.4, 4.5); scene.add(key);
+      const rim = new THREE.DirectionalLight(0xa855f7, 0.65); rim.position.set(-3.2, -0.6, 2.2); scene.add(rim);
+      const orb1 = new THREE.PointLight(0x22c55e, 0.55, 24);
+      const orb2 = new THREE.PointLight(0x50c8ff, 0.55, 24);
+      scene.add(orb1, orb2);
+
+      // aurora ribbon
+      const ribbonGeo = new THREE.PlaneGeometry(18, 8, 1, 1);
+      const ribbonMat = new THREE.ShaderMaterial({
+        transparent: true,
+        blending: THREE.AdditiveBlending,
+        uniforms: {
+          uTime: { value: 0 },
+          uA1: { value: new THREE.Color(0x50c8ff) },
+          uA2: { value: new THREE.Color(0xa855f7) },
+          uA3: { value: new THREE.Color(0x22c55e) },
+        },
+        vertexShader: `varying vec2 vUv; void main(){ vUv=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`,
+        fragmentShader: `
+          varying vec2 vUv; uniform float uTime; uniform vec3 uA1; uniform vec3 uA2; uniform vec3 uA3;
+          float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1,311.7))) * 43758.5453123); }
+          float noise(vec2 p){
+            vec2 i=floor(p), f=fract(p);
+            float a=hash(i), b=hash(i+vec2(1.0,0.0)), c=hash(i+vec2(0.0,1.0)), d=hash(i+vec2(1.0,1.0));
+            vec2 u=f*f*(3.0-2.0*f);
+            return mix(a,b,u.x) + (c-a)*u.y*(1.0-u.x) + (d-b)*u.x*u.y;
+          }
+          void main(){
+            vec2 uv=vUv; float t=uTime;
+            float n=noise(uv*4.0+vec2(t*0.08,-t*0.05));
+            float wave=sin((uv.y*8.0)+t*0.88+n*2.0)*0.18;
+            float band=smoothstep(0.30+wave,0.70+wave,uv.x)*(1.0-smoothstep(0.74+wave,1.0,uv.x));
+            vec3 col=mix(uA1,uA2,uv.y); col=mix(col,uA3,n*0.45);
+            float glow=band*(0.34+n*0.52);
+            float vign=smoothstep(0.0,0.25,uv.y)*(1.0-smoothstep(0.75,1.0,uv.y));
+            gl_FragColor=vec4(col*glow*vign, glow*0.58);
+          }
+        `
+      });
+      const ribbon = new THREE.Mesh(ribbonGeo, ribbonMat);
+      ribbon.position.set(0, 0.65, -2.35);
+      ribbon.rotation.x = -0.25;
+      scene.add(ribbon);
+
+      // particles
+      const pCount = 1700;
+      const pGeo = new THREE.BufferGeometry();
+      const pos = new Float32Array(pCount * 3);
+      for (let i=0; i<pCount; i++){
+        const r = 5.3 * Math.random();
+        const theta = Math.random() * Math.PI * 2;
+        const phi = Math.acos(2 * Math.random() - 1);
+        pos[i*3+0] = r * Math.sin(phi) * Math.cos(theta);
+        pos[i*3+1] = (r * Math.sin(phi) * Math.sin(theta)) * 0.72;
+        pos[i*3+2] = r * Math.cos(phi);
+      }
+      pGeo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+      const points = new THREE.Points(pGeo, new THREE.PointsMaterial({ size: 0.014, color: 0xffffff, transparent:true, opacity: 0.40 }));
+      scene.add(points);
+
+      // instanced floaters
+      const instCount = 48;
+      const inst = new THREE.InstancedMesh(
+        new THREE.IcosahedronGeometry(0.12, 0),
+        new THREE.MeshStandardMaterial({
+          color: 0x9ae6ff, metalness: 0.22, roughness: 0.35,
+          emissive: new THREE.Color(0x0b1026), emissiveIntensity: 0.25
+        }),
+        instCount
+      );
+      inst.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+      scene.add(inst);
+
+      const dummy = new THREE.Object3D();
+      const seeds = Array.from({length: instCount}, () => ({
+        a: Math.random()*Math.PI*2,
+        r: 1.8 + Math.random()*2.4,
+        y: (Math.random()-0.5)*1.5,
+        w: 0.45 + Math.random()*1.25
+      }));
+
+      // group + HUD rings
+      const group = new THREE.Group(); scene.add(group);
+      const ringMat = new THREE.MeshBasicMaterial({ color: 0x7dd3fc, transparent:true, opacity:0.18, blending: THREE.AdditiveBlending, depthWrite:false });
+      const ring1 = new THREE.Mesh(new THREE.TorusGeometry(1.65, 0.01, 8, 240), ringMat);
+      ring1.position.set(0, 0.05, -0.15); ring1.rotation.x = Math.PI * 0.5; group.add(ring1);
+      const ring2 = new THREE.Mesh(new THREE.TorusGeometry(2.05, 0.012, 8, 240), ringMat.clone());
+      ring2.material.color = new THREE.Color(0xa855f7); ring2.material.opacity = 0.14;
+      ring2.position.set(0, 0.05, -0.25); ring2.rotation.x = Math.PI * 0.5; group.add(ring2);
+
+      // bloom
+      let composer = null, bloomPass = null;
+      const enableBloom = !reduceMotion && !isCoarse;
+      const bloomBase = { strength: 0.55, radius: 0.35, threshold: 0.22 };
+      let bloomKick = 0;
+
+      if (enableBloom) {
+        composer = new EffectComposer(renderer);
+        composer.addPass(new RenderPass(scene, camera));
+        bloomPass = new UnrealBloomPass(new THREE.Vector2(1,1), bloomBase.strength, bloomBase.radius, bloomBase.threshold);
+        composer.addPass(bloomPass);
+      }
+
+      function resize(){
+        const w = hero.clientWidth, h = hero.clientHeight;
+        const dpr = Math.min(window.devicePixelRatio || 1, dprCap);
+        renderer.setPixelRatio(dpr);
+        renderer.setSize(w, h, false);
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+        composer?.setSize(w, h);
+        bloomPass?.setSize(w, h);
+      }
+      resize();
+      addEventListener("resize", resize, { passive:true });
+
+      // mouse
+      let mx3 = 0, my3 = 0;
+      if (!reduceMotion) {
+        hero.addEventListener("pointermove", (e) => {
+          const r = hero.getBoundingClientRect();
+          mx3 = ((e.clientX - r.left) / r.width) - 0.5;
+          my3 = ((e.clientY - r.top) / r.height) - 0.5;
+        }, { passive:true });
+        hero.addEventListener("pointerleave", () => { mx3 = 0; my3 = 0; }, { passive:true });
+      }
+
+      // click shockwaves
+      const waves = [];
+      const baseWaveMat = new THREE.MeshBasicMaterial({
+        color: 0x50c8ff, transparent:true, opacity:0.0,
+        blending: THREE.AdditiveBlending, depthWrite:false
+      });
+      function spawnWave(){
+        const g = new THREE.RingGeometry(0.15, 0.22, 64);
+        const m = baseWaveMat.clone();
+        m.color = new THREE.Color(Math.random() > 0.5 ? 0x50c8ff : 0xa855f7);
+        m.opacity = 0.90;
+        const mesh = new THREE.Mesh(g, m);
+        mesh.position.set(0, 0.05, 0.6);
+        mesh.rotation.x = Math.PI * 0.5;
+        group.add(mesh);
+        waves.push({ mesh, t: 0 });
+        bloomKick = 1.0;
+      }
+      hero.addEventListener("pointerdown", () => { if (!reduceMotion) spawnWave(); }, { passive:true });
+
+      // pause offscreen
+      let running = true;
+      const io = new IntersectionObserver((entries)=>{ running = entries[0]?.isIntersecting ?? true; }, { threshold: 0.08 });
+      io.observe(hero);
+
+      let t = 0;
+      function animate(){
+        requestAnimationFrame(animate);
+        if (reduceMotion || !running || document.hidden) return;
+
+        t += 0.01;
+        orb1.position.set(Math.cos(t*1.2)*2.9, 1.25 + Math.sin(t*1.4)*0.42, 2.1 + Math.sin(t*1.1)*1.2);
+        orb2.position.set(Math.sin(t*1.1)*2.7, 0.62 + Math.cos(t*1.3)*0.55, 2.6 + Math.cos(t*1.05)*1.05);
+
+        group.rotation.y = t * 0.18 + mx3 * 1.02;
+        group.rotation.x = (Math.sin(t*0.7) * 0.06) + (-my3 * 0.54);
+        group.position.y = Math.sin(t * 0.9) * 0.07;
+
+        ring1.rotation.z = t * 0.38;
+        ring2.rotation.z = -t * 0.30;
+
+        ribbonMat.uniforms.uTime.value = t;
+        points.rotation.y = -t * 0.085;
+
+        for (let i=0; i<instCount; i++){
+          const s = seeds[i];
+          const a = s.a + t*s.w;
+          dummy.position.set(Math.cos(a)*s.r, s.y + Math.sin(t*1.2 + s.a)*0.16, Math.sin(a)*s.r);
+          dummy.rotation.set(a*0.35, a*0.6, a*0.25);
+          dummy.scale.setScalar(0.86 + Math.sin(t*1.1 + s.a)*0.28);
+          dummy.updateMatrix();
+          inst.setMatrixAt(i, dummy.matrix);
+        }
+        inst.instanceMatrix.needsUpdate = true;
+
+        for (let i=waves.length-1; i>=0; i--){
+          const w = waves[i];
+          w.t += 0.02;
+          const s = 1.0 + w.t * 5.0;
+          w.mesh.scale.setScalar(s);
+          w.mesh.material.opacity = Math.max(0, 0.90 * (1.0 - w.t));
+          w.mesh.position.z = 0.6 - w.t * 0.4;
+          if (w.t >= 1.0){
+            group.remove(w.mesh);
+            w.mesh.geometry.dispose();
+            w.mesh.material.dispose();
+            waves.splice(i, 1);
+          }
+        }
+
+        bloomKick = Math.max(0, bloomKick - 0.03);
+        if (bloomPass) {
+          const kick = bloomKick * 0.35;
+          bloomPass.strength = bloomBase.strength + kick;
+          bloomPass.radius   = bloomBase.radius + kick * 0.18;
+        }
+
+        camera.position.z = 6.25 + Math.sin(t*0.55) * 0.06 + (Math.abs(mx3) + Math.abs(my3)) * 0.10;
+        camera.position.x = mx3 * 0.08;
+        camera.position.y = 0.48 + (-my3) * 0.08;
+        camera.lookAt(0, 0.05, 0);
+
+        composer ? composer.render() : renderer.render(scene, camera);
+      }
+      animate();
+    }
+
+    if (!reduceMotion) init3D();
+  </script>
+</body>
+</html>
