@@ -79,14 +79,14 @@
       margin: 0 auto;
       padding: 0 18px;
       position: relative;
-      z-index: 7;
+      z-index: 6;
     }
 
     /* ---------------- HERO ---------------- */
     .hero{
       position:relative;
-        /* min-height: 860px; ← これをやめて可変に */
-	　min-height: clamp(640px, 78vh, 780px);
+        /* min-height:860px; ← これをやめて可変に */
+      min-height: clamp(640px, 78vh, 780px);
       overflow:hidden;
       box-shadow: var(--shadow);
       isolation:isolate;
@@ -124,7 +124,7 @@
   transform: translate(-50%,-50%);
   width: min(920px, 92vw);
   height:auto;
-  z-index:4;                 /* scanlines(5)より下、前面FXより上にしたい */
+  z-index:6;                /* ロゴを暗幕より上へ */
   pointer-events:none;
   user-select:none;
   filter:
@@ -225,7 +225,7 @@
     /* スキャンライン（センセーショナル） */
     .scanlines{
       position:absolute; inset:0;
-      z-index:5;
+      z-index:7;  /* スキャンラインは最前面でOK */
       pointer-events:none;
       background: repeating-linear-gradient(
         to bottom,
@@ -242,7 +242,7 @@
     /* HEROの暗幕（読みやすさ） */
     .heroShade{
       position:absolute; inset:0;
-      z-index:6;
+      z-index:5;  /* 暗幕をロゴより下へ */
       pointer-events:none;
       background:
         radial-gradient(1200px 860px at 60% 35%, rgba(0,0,0,.06), rgba(0,0,0,.64));
@@ -384,25 +384,24 @@
 
     /* 下部UI（CTA） */
     .heroWrap{
-      min-height: 100%;           /* ← 860px固定をやめる */
-      display:grid;
-      align-items:end;
-      position: relative;
-      padding: 600px 0 24px;    /* ← 縦を少し圧縮 */
-      z-index: 7;
-    }
+  margin-top:auto; /* ←これが本体 */
+  padding: 0 0 calc(24px + env(safe-area-inset-bottom));
+  display:block;   /* grid下寄せは捨てる */
+  min-height: 0;   /* 100%は不要 */
+}
 
     .heroContent{
-      position:relative;
-      max-width: 980px;
-      padding: 16px 16px 16px;
-      border-radius: calc(var(--radius) + 10px);
-      border: 1px solid rgba(255,255,255,.14);
-      background: rgba(255,255,255,.05);
-      backdrop-filter: blur(14px);
-      box-shadow: 0 26px 90px rgba(0,0,0,.38);
-      overflow:hidden;
-    }
+  position:relative;
+  max-width: clamp(900px, 90vw, 1440px); /* 横幅をさらに広く */
+  margin: 0 auto;
+  padding: 32px;
+  border-radius: calc(var(--radius) + 10px);
+  border: 1px solid rgba(255,255,255,.14);
+  background: rgba(0,0,0,.16);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 26px 90px rgba(0,0,0,.38);
+  overflow:hidden;
+}
     .heroContent::before{
       content:"";
       position:absolute; inset:-2px;
@@ -437,15 +436,9 @@
 }
 .hero-topline .dot{ margin-top:0; }
 
-/* ✅ 情シス文言を“下に” */
-.heroLead{ margin-top: 28px; }  /* 好みで 18〜40px */
+/* ✅ 情シス文言を“上に”寄せて枠内に収める（微調整） */
+.heroLead{ margin-top: -40px; }  /* 好みで -18px〜-40px  */
 
-/* ✅ 2ボタンだけ白 */
-.hero-actions .btn,
-.hero-actions .btn:visited,
-.hero-actions .btn:hover,
-.hero-actions .btn:active{ color:#fff; }
-.hero-actions .btn .mini{ color:rgba(255,255,255,.85); }
 
 /* ✅ きょうのおみくじは白くしない（アクセント色） */
 .omikuji-link,
@@ -501,13 +494,7 @@
   margin-top:.22rem; /* dotの微調整 */
 }
 
-/* 日本語1行 */
-.heroLead{
-  margin-top:.85rem;
-  max-width: 52ch;   /* 左の塊を締める（バランス改善） */
-  line-height:1.65;
-  opacity:.92;
-}
+
 
 /* =========================
    CTA：修正
@@ -550,20 +537,19 @@
 /* .ctaFrame::before の不要な定義を削除 */
 /* .ctaFrame の不要な定義を削除 */
 
-/* .hero-actions .btn の重複定義を削除 */
 
 /* ✅ きょうのおみくじは白強制しない（必要なら任意色を指定） */
 .omikuji-link,
-.omikuji-link:visited{
-  color: inherit; /* もともとの色に戻す */
-}
+.omikuji-link:visited{ color: var(--a1); }
+.omikuji-link .mini{ color: rgba(80,200,255,.85); }
 
 /* .hero-topline の重複定義を削除 */
 /* =========================
    きょうのおみくじ：右側へ（改善案B）
 ========================= */
-.heroContent{ position:relative; } /* heroFunを絶対配置するため */
-
+.heroContent{
+  padding-bottom: 86px; /* おみくじボタン分の逃げ */
+}
 .heroFun{
   position:absolute;
   right: 16px;
@@ -579,9 +565,6 @@
 
 /* スマホは詰まりやすいので下へ逃がす */
 @media (max-width: 680px){
-  .heroCTA{ grid-template-columns: 1fr; }
-  .heroCTA .btn.primary{ grid-column:auto; }
-
   .heroFun{
     position: static;
     margin-top: 12px;
@@ -736,7 +719,9 @@
 
 /* 1) HEROを少し広げる（まずここが効きます） */
 .hero{
-  min-height: clamp(760px, 92vh, 980px);
+  display:flex;
+  flex-direction:column;
+  min-height: clamp(760px, 92svh, 980px); /* svh推奨（スマホで安定） */
 }
 
 /* 2) 中央ロゴを少し上へ（カードと干渉しにくく） */
@@ -744,11 +729,7 @@
   top: 44%;            /* 52% → 44%（好みで 42〜48%） */
 }
 
-/* 3) 下部カードが“背景を殺しすぎない”ように透けを増やす */
-.heroContent{
-  background: rgba(0,0,0,.16);     /* 透けを増やす（読みやすさは維持） */
-  backdrop-filter: blur(10px);     /* 14px→10pxで“ぼかし過ぎ”を減らす */
-}
+/* 3) 下部カードが“背景を殺しすぎない”ように透けを増やす (マージ済み) */
 .heroContent::before{
   opacity: .72;                   /* 0.95→少し下げて背景を見せる */
 }
@@ -797,8 +778,21 @@
 }
 .btn .mini{opacity:.8; font-weight:400; margin-left:8px; font-size:12px;}
 
-	</style>
-</head>
+.hint.heroHint {
+  position: relative;
+  display: block;
+  text-align: left; /* 左揃えに変更 */
+  width: 100%;
+  margin-top: 30px;
+  opacity: 1;
+  color: rgba(234,240,255,.66);
+  font-size: 12px;
+  letter-spacing: .06em;
+}
+
+	
+
+	</style></head>
 
 <body>
   <a class="skip-link" href="#content">本文へスキップ</a>
@@ -857,8 +851,6 @@
       <div class="sticker d" data-parallax data-speed="0.11" data-mouse="1.05"><span class="emo">✨</span> Playful</div>
     </div>
 
-    <!-- 下部CTA（プレイアフルな操作・クリック波紋あり） -->
-<!-- ✅ 右上1行キャッチ -->
 <div class="hero-topline" aria-label="tagline">
   <span class="dot" aria-hidden="true"></span>
   Touch It, It Talks - From Chaos to Clarity
@@ -873,7 +865,7 @@
     </div>
 
     <div class="heroCTAWrap" aria-label="Primary navigation">
-      <div class="hero-actions">
+      <div class="heroCTA">
         <span class="ctaFrame">
           <a class="btn primary magnetic" href="#about">概要を見る <span class="mini">full width</span></a>
         </span>
@@ -884,7 +876,6 @@
 
       <p class="hint heroHint">画面をタップ/クリックすると、光の波が広がります</p>
 
-      <!-- ✅ きょうのおみくじ：右側へ -->
       <div class="heroFun">
         <a class="btn magnetic omikuji-link" href="./omikuji/omikuji-index.html">
           きょうのおみくじ <span class="mini">meditation</span>
@@ -894,7 +885,7 @@
 
   </div>
 </div>
-  </header>
+</header>
 
   <main id="content">
     <section id="about" class="section full">
