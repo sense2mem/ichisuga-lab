@@ -411,118 +411,119 @@
       pointer-events:none;
     }
 
-    .kicker{
-      position:relative;
-      display:inline-flex; gap:10px; align-items:flex-start;
-      padding: 8px 12px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.16);
-      background: rgba(0,0,0,.20);
-      color: rgba(234,240,255,.92);
-      font-size: 12px;
-      letter-spacing:.10em;
-      text-transform: uppercase;
-      width: fit-content;
-      box-shadow: 0 12px 30px rgba(0,0,0,.22);
-    }
-/* 英語2行 kicker */
+/* =========================
+   kicker（英語2行）
+========================= */
 .kicker{
-  display:flex;
-  align-items:flex-start;
-  gap:.6rem;
+  position:relative;
+  display:inline-flex;
+  gap:10px;
+  align-items:flex-start; /* dotと1行目を揃える */
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.16);
+  background: rgba(0,0,0,.20);
+  color: rgba(234,240,255,.92);
+  font-size: 12px;
+  letter-spacing:.10em;
+  text-transform: uppercase;
+  width: fit-content;
+  box-shadow: 0 12px 30px rgba(0,0,0,.22);
 }
 
 .kickerText{
-  display: flex;
-  flex-direction: column;
-  line-height: 1.1;
-  transform: translateY(-12px);   /* ←英字を少し上へ（-2pxでもOK） */
+  display:flex;
+  flex-direction:column;
+  line-height:1.1;
+  transform: translateY(-1px); /* “少し上”に。-2pxまで好みで */
 }
-
-.kickerMain{
-  display:block;
-  letter-spacing:.14em;
-}
-
+.kickerMain{ display:block; letter-spacing:.14em; }
 .kickerSub{
   display:block;
   margin-top:.28rem;
   font-style:italic;
   letter-spacing:.08em;
   opacity:.82;
+  /* サブ行だけ大文字をやめたいなら↓ */
+  /* text-transform:none; */
 }
 
-/* dotが上寄りに見える場合の微調整 */
-.kicker .dot{
-  margin-top:.22rem;
+.dot{
+  width:8px;height:8px;border-radius:999px;
+  background: radial-gradient(circle at 30% 30%, #fff, var(--a1));
+  box-shadow: 0 0 14px rgba(80,200,255,.65);
+  margin-top:.22rem; /* dotの微調整 */
 }
 
-/* 日本語1行（英語の下に“約束”として置く） */
+/* 日本語1行 */
 .heroLead{
   margin-top:.85rem;
-  max-width:56ch;
+  max-width: 52ch;   /* 左の塊を締める（バランス改善） */
   line-height:1.65;
   opacity:.92;
-  /* 既存のタイポに合わせて必要なら */
-  /* font-size: clamp(14px, 1.6vw, 17px); */
 }
-	  
-	  
-	.dot{
-      width:8px;height:8px;border-radius:999px;
-      background: radial-gradient(circle at 30% 30%, #fff, var(--a1));
-      box-shadow: 0 0 14px rgba(80,200,255,.65);
-    }
 
-    .heroCTA{
-      position:relative;
-      margin-top: 12px;
-      display:flex; gap:12px; flex-wrap:wrap;
-      align-items:center;
-    }
+/* =========================
+   CTA：2段（改善案A）
+========================= */
+.heroCTA{
+  position:relative;
+  margin-top: 14px;
 
-    .btn{
-      display:inline-flex; align-items:center; justify-content:center;
-      padding: 12px 16px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.16);
-      background: rgba(255,255,255,.08);
-      color: var(--text);
-      box-shadow: 0 18px 40px rgba(0,0,0,.25);
-      backdrop-filter: blur(12px);
-      transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
-      will-change: transform;
-      font-weight:700;
-      position:relative;
-      overflow:hidden;
-    }
-    .btn::before{
-      content:"";
-      position:absolute; inset:-2px;
-      background: radial-gradient(240px 140px at var(--mx,50%) var(--my,50%),
-        rgba(80,200,255,.25), rgba(168,85,247,.20), transparent 60%);
-      opacity:0;
-      transition: opacity .15s ease;
-      pointer-events:none;
-    }
-    .btn:hover::before{opacity:1;}
-    .btn:hover{
-      transform: translateY(-2px);
-      background: rgba(255,255,255,.10);
-      box-shadow: 0 22px 70px rgba(0,0,0,.38);
-    }
-    .btn.primary{
-      border-color: rgba(80,200,255,.38);
-      background: linear-gradient(135deg, rgba(80,200,255,.22), rgba(168,85,247,.18));
-    }
-    .btn .mini{opacity:.8; font-weight:400; margin-left:8px; font-size:12px;}
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
 
-    .hint{
-      position:relative;
-      color: rgba(234,240,255,.66);
-      font-size: 12px;
-      letter-spacing:.06em;
-    }
+  max-width: 520px;   /* 左に“柱”を作る */
+}
+
+.heroCTA .btn{
+  width:100%;
+  justify-content:center;
+}
+
+.heroCTA .btn.primary{
+  grid-column: 1 / -1; /* 「概要を見る」をフル幅 */
+}
+
+/* ヒントをCTA直下に寄せる */
+.hint.heroHint{
+  margin-top: 10px;
+  max-width: 520px;
+  color: rgba(234,240,255,.66);
+  font-size: 12px;
+  letter-spacing:.06em;
+}
+
+/* =========================
+   きょうのおみくじ：右側へ（改善案B）
+========================= */
+.heroContent{ position:relative; } /* heroFunを絶対配置するため */
+
+.heroFun{
+  position:absolute;
+  right: 16px;
+  bottom: 16px;
+  z-index: 2;
+}
+
+.heroFun .btn{
+  padding: 10px 14px;   /* 少し小さめ */
+  font-weight: 700;
+  opacity: .95;
+}
+
+/* スマホは詰まりやすいので下へ逃がす */
+@media (max-width: 680px){
+  .heroCTA{ grid-template-columns: 1fr; }
+  .heroCTA .btn.primary{ grid-column:auto; }
+
+  .heroFun{
+    position: static;
+    margin-top: 12px;
+  }
+}
+
 
 /* ✅ 「概要」セクションの背面に画像を敷く */
 #about{
@@ -551,11 +552,6 @@
   position: relative;
   z-index: 1;
 }
-
-
-
-
-
 
     /* ---------------- Sections ---------------- */
     .section{
@@ -744,11 +740,16 @@
 		</div>
 
 		<div class="heroCTA">
-          <a class="btn primary magnetic" href="#about">概要を見る <span class="mini">full width</span></a>
-	　    <a class="btn magnetic" href="#themes">相談テーマ <span class="mini">3 cards</span></a>
-		  <a class="btn magnetic" href="./omikuji/omikuji-index.html">きょうのおみくじ <span class="mini">meditation</span></a>
-	　<span class="hint">画面をタップ/クリックすると、光の波が広がります</span>
-        </div>
+ 		 	<a class="btn primary magnetic" href="#about">概要を見る <span class="mini">full width</span></a>
+  			<a class="btn magnetic" href="#themes">相談テーマ <span class="mini">3 cards</span></a>
+		</div>
+
+		<p class="hint heroHint">画面をタップ/クリックすると、光の波が広がります</p>
+
+		<!-- ✅ きょうのおみくじ：右側へ（改善案B） -->
+		<div class="heroFun">
+  			<a class="btn magnetic" href="./omikuji/omikuji-index.html">きょうのおみくじ <span class="mini">meditation</span></a>
+		</div>
       </div>
     </div>
   </header>
@@ -1267,6 +1268,7 @@ function updateParallax(){
   </script>
 </body>
 </html>
+
 
 
 
