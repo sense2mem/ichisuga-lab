@@ -34,17 +34,7 @@
       --mx: 50%;
       --my: 50%;
     }
-/* HERO内のボタン文字色を白に */
-.hero .btn,
-.hero .btn:visited,
-.hero .btn:hover,
-.hero .btn:active{
-  color:#fff;
-}
 
-.hero .btn .mini{
-  color:rgba(255,255,255,.85);
-}
     *{box-sizing:border-box;}
     html{scroll-behavior:smooth;}
     body{
@@ -394,11 +384,11 @@
 
     /* 下部UI（CTA） */
     .heroWrap{
-      min-height: 860px;
+      min-height: 0;           /* ← 860px固定をやめる */
       display:grid;
       align-items:end;
       position: relative;
-      padding: 72px 0 36px;
+      padding: 56px 0 28px;    /* ← 縦を少し圧縮 */
       z-index: 7;
     }
 
@@ -422,6 +412,51 @@
       pointer-events:none;
     }
 
+/* ✅ 右上1行 */
+.hero-topline{
+  position:absolute;
+  top:18px;
+  right:18px;
+  z-index:8;
+
+  display:flex;
+  align-items:center;
+  gap:10px;
+
+  font-size:12px;
+  letter-spacing:.10em;
+  text-transform: none;
+  color: rgba(234,240,255,.90);
+
+  padding:10px 14px;
+  border-radius:999px;
+  background:rgba(7,10,20,.35);
+  border:1px solid rgba(255,255,255,.16);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+.hero-topline .dot{ margin-top:0; }
+
+/* ✅ 情シス文言を“下に” */
+.heroLead{ margin-top: 28px; }  /* 好みで 18〜40px */
+
+/* ✅ 2ボタンだけ白 */
+.hero-actions .btn,
+.hero-actions .btn:visited,
+.hero-actions .btn:hover,
+.hero-actions .btn:active{ color:#fff; }
+.hero-actions .btn .mini{ color:rgba(255,255,255,.85); }
+
+/* ✅ きょうのおみくじは白くしない（アクセント色） */
+.omikuji-link,
+.omikuji-link:visited{ color: var(--a1); }
+.omikuji-link .mini{ color: rgba(80,200,255,.85); }
+
+/* スマホでブランドが横幅を使う場合、キャッチを下に逃がす */
+@media (max-width: 680px){
+  .hero-topline{ top: calc(var(--safeTop) + 8px); }
+}
+	  
 /* =========================
    kicker（英語2行）
 ========================= */
@@ -797,36 +832,42 @@
     </div>
 
     <!-- 下部CTA（プレイアフルな操作・クリック波紋あり） -->
-    <div class="inner heroWrap">
-      <div class="heroContent" id="heroCard">
-          <div class="kicker">
- 			 <span class="dot" aria-hidden="true"></span>
- 			 <span class="kickerText">
-	　 	   		 <div class="hero-topline">Touch It, It Talks - From Chaos to Clarity</div>
-      	    </span>
-		</div>
+<!-- ✅ 右上1行キャッチ -->
+<div class="hero-topline" aria-label="tagline">
+  <span class="dot" aria-hidden="true"></span>
+  Touch It, It Talks - From Chaos to Clarity
+</div>
 
-		<div class="heroLead">
-		  <p class="hero-lead">情シス/現場運用の“混乱”を、標準化と自動化で減らします。</p>
-		</div>
-　　<div class="heroCTAWrap" aria-label="Primary navigation">
-		<div class="hero-actions">
-  			<span class="ctaFrame">
-   				 <a class="btn primary magnetic" href="#about">概要を見る <span class="mini">full width</span></a>
- 			 </span>
+<!-- 下部CTA（プレイアフルな操作・クリック波紋あり） -->
+<div class="inner heroWrap">
+  <div class="heroContent" id="heroCard">
 
-			  <span class="ctaFrame">
-				<a class="btn magnetic" href="#themes">相談テーマ <span class="mini">3 cards</span></a>
-			  </span>
-		</div>
-		<p class="hint heroHint">画面をタップ/クリックすると、光の波が広がります</p>
+    <div class="heroLead">
+      <p class="hero-lead">情シス/現場運用の“混乱”を、標準化と自動化で減らします。</p>
+    </div>
 
-		<!-- ✅ きょうのおみくじ：右側へ　-->
-		<div class="heroFun">
-  			<a class="btn magnetic" href="./omikuji/omikuji-index.html">きょうのおみくじ <span class="mini">meditation</span></a>
-		</div>
+    <div class="heroCTAWrap" aria-label="Primary navigation">
+      <div class="hero-actions">
+        <span class="ctaFrame">
+          <a class="btn primary magnetic" href="#about">概要を見る <span class="mini">full width</span></a>
+        </span>
+        <span class="ctaFrame">
+          <a class="btn magnetic" href="#themes">相談テーマ <span class="mini">3 cards</span></a>
+        </span>
+      </div>
+
+      <p class="hint heroHint">画面をタップ/クリックすると、光の波が広がります</p>
+
+      <!-- ✅ きょうのおみくじ：右側へ -->
+      <div class="heroFun">
+        <a class="btn magnetic omikuji-link" href="./omikuji/omikuji-index.html">
+          きょうのおみくじ <span class="mini">meditation</span>
+        </a>
       </div>
     </div>
+
+  </div>
+</div>
   </header>
 
   <main id="content">
@@ -1343,6 +1384,7 @@ function updateParallax(){
   </script>
 </body>
 </html>
+
 
 
 
