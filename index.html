@@ -474,68 +474,48 @@
   gap:12px;
   flex-wrap:wrap;
   align-items:center;
-  max-width: 520px; /* 左の塊として締める（任意） */
 }
 
-/* ✅ フル幅にしていた設定があれば無効化 */
-.heroCTA .btn{
-  width: auto;              /* ← 100% を戻す */
-  justify-content: center;  /* 中央揃えは維持 */
-}
-
-/* ヒントをCTA直下に寄せる */
-.hint.heroHint{
-  margin-top: 10px;
-  max-width: 520px;
-  color: rgba(234,240,255,.66);
-  font-size: 12px;
-  letter-spacing:.06em;
-}
-
-/* ✅ 2ボタンを囲うラッパー（外枠） */
-.heroCTAWrap{
-  position: relative;
-  margin-top: 14px;
-  width: fit-content;
-  max-width: min(560px, calc(100vw - 32px));
-
-  padding: 10px 10px;
+/* ✅ 各ボタンの“外枠” */
+.ctaFrame{
+  display:inline-flex;
+  padding: 6px;                 /* 枠の太さ：4〜8pxで好み調整 */
   border-radius: 999px;
   border: 1px solid rgba(255,255,255,.14);
-  background: rgba(0,0,0,.16);
+  background: rgba(0,0,0,.14);
   backdrop-filter: blur(12px);
-  box-shadow: 0 20px 70px rgba(0,0,0,.28);
+  box-shadow: 0 18px 55px rgba(0,0,0,.22);
 }
 
-/* ✅ 内側：2ボタン並び（従来の“枠付きピル”感を維持） */
-.heroCTA{
-  display:flex;
-  gap:12px;
-  align-items:center;
-  flex-wrap:wrap;
+/* 外枠があるので、ボタン側の影を少し抑えて二重感を減らす（任意） */
+.ctaFrame .btn{
+  box-shadow: 0 12px 30px rgba(0,0,0,.18);
 }
 
-/* ✅ グリッド時代の設定が残っていても戻す */
-.heroCTA .btn{
-  width: auto;
-  justify-content: center;
-}
-
-/* ✅ スマホ：囲いはカプセルをやめて角丸カード寄りに */
+/* スマホは縦積みに */
 @media (max-width: 680px){
-  .heroCTAWrap{
-    width: 100%;
-    border-radius: 18px;
-    padding: 12px;
-  }
   .heroCTA{
     flex-direction: column;
-    align-items: stretch;
+    align-items: flex-start;
   }
-  .heroCTA .btn{
+  .ctaFrame{
     width: 100%;
   }
+  .ctaFrame .btn{
+    width: 100%;
+    justify-content: center;
+  }
 }
+.ctaFrame::before{
+  content:"";
+  position:absolute;
+  inset:-2px;
+  border-radius: inherit;
+  background: radial-gradient(240px 140px at 30% 30%, rgba(80,200,255,.16), transparent 60%);
+  opacity:.9;
+  pointer-events:none;
+}
+.ctaFrame{ position:relative; }
 	  
 /* =========================
    きょうのおみくじ：右側へ（改善案B）
@@ -782,10 +762,14 @@
 		</div>
 　　<div class="heroCTAWrap" aria-label="Primary navigation">
 		<div class="heroCTA">
- 		 	<a class="btn primary magnetic" href="#about">概要を見る <span class="mini">full width</span></a>
-  			<a class="btn magnetic" href="#themes">相談テーマ <span class="mini">3 cards</span></a>
+  			<span class="ctaFrame">
+   				 <a class="btn primary magnetic" href="#about">概要を見る <span class="mini">full width</span></a>
+ 			 </span>
+
+			  <span class="ctaFrame">
+				<a class="btn magnetic" href="#themes">相談テーマ <span class="mini">3 cards</span></a>
+			  </span>
 		</div>
-　　</div>
 		<p class="hint heroHint">画面をタップ/クリックすると、光の波が広がります</p>
 
 		<!-- ✅ きょうのおみくじ：右側へ　-->
@@ -1310,6 +1294,7 @@ function updateParallax(){
   </script>
 </body>
 </html>
+
 
 
 
