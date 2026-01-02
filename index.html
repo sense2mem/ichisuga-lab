@@ -845,6 +845,32 @@
 .themes{ align-items: stretch; }
 .tilt{ height: 100%; }
 
+/* 既存のタグリンク共通 */
+.tags .tag-link{
+  display:inline-block;
+  text-decoration:none;
+  color:inherit;
+}
+
+/* ✅ 大きいボタン版 */
+.tags .tag-link--lg{
+  font-size:1.05rem;       /* 文字を少し大きく */
+  padding:12px 18px;       /* クリック領域を拡大 */
+  border-radius:999px;     /* タグ風の丸み */
+  border:1px solid rgba(255,255,255,.22);
+  background:rgba(255,255,255,.06);
+}
+
+/* ホバー時（任意） */
+.tags .tag-link--lg:hover{
+  background:rgba(255,255,255,.10);
+}
+
+/* キーボード操作の視認性（任意） */
+.tags .tag-link--lg:focus-visible{
+  outline:2px solid currentColor;
+  outline-offset:3px;
+}
 
 	</style></head>
 
@@ -969,7 +995,11 @@
               <li><a href="https://x.com/" target="_blank" rel="noopener noreferrer">SNS（X）</a></li>
             </ul>
             <h3 style="margin-top:16px;">連絡</h3>
-            <p>フォームは置かず、必要な導線だけ（SNSのDM／メール等）に絞ります。</p>
+<p>以下のフォームよりお問い合せください。</p>
+
+<a class="btn magnetic omikuji-link" href="https://forms.office.com/r/902YpxzxNr" target="_blank" rel="noopener" style="margin-top: 8px; display: inline-block;">
+      お問い合せ
+</a>
           </div>
         </div>
       </div>
