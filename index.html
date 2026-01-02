@@ -492,6 +492,51 @@
   letter-spacing:.06em;
 }
 
+/* ✅ 2ボタンを囲うラッパー（外枠） */
+.heroCTAWrap{
+  position: relative;
+  margin-top: 14px;
+  width: fit-content;
+  max-width: min(560px, calc(100vw - 32px));
+
+  padding: 10px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.14);
+  background: rgba(0,0,0,.16);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 20px 70px rgba(0,0,0,.28);
+}
+
+/* ✅ 内側：2ボタン並び（従来の“枠付きピル”感を維持） */
+.heroCTA{
+  display:flex;
+  gap:12px;
+  align-items:center;
+  flex-wrap:wrap;
+}
+
+/* ✅ グリッド時代の設定が残っていても戻す */
+.heroCTA .btn{
+  width: auto;
+  justify-content: center;
+}
+
+/* ✅ スマホ：囲いはカプセルをやめて角丸カード寄りに */
+@media (max-width: 680px){
+  .heroCTAWrap{
+    width: 100%;
+    border-radius: 18px;
+    padding: 12px;
+  }
+  .heroCTA{
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .heroCTA .btn{
+    width: 100%;
+  }
+}
+	  
 /* =========================
    きょうのおみくじ：右側へ（改善案B）
 ========================= */
@@ -735,15 +780,15 @@
 		<div class="heroLead">
 		  情シス/現場運用の“混乱”を、標準化と自動化で減らします。
 		</div>
-
+　　<div class="heroCTAWrap" aria-label="Primary navigation">
 		<div class="heroCTA">
  		 	<a class="btn primary magnetic" href="#about">概要を見る <span class="mini">full width</span></a>
   			<a class="btn magnetic" href="#themes">相談テーマ <span class="mini">3 cards</span></a>
 		</div>
-
+　　</div>
 		<p class="hint heroHint">画面をタップ/クリックすると、光の波が広がります</p>
 
-		<!-- ✅ きょうのおみくじ：右側へ（改善案B） -->
+		<!-- ✅ きょうのおみくじ：右側へ　-->
 		<div class="heroFun">
   			<a class="btn magnetic" href="./omikuji/omikuji-index.html">きょうのおみくじ <span class="mini">meditation</span></a>
 		</div>
@@ -1265,6 +1310,7 @@ function updateParallax(){
   </script>
 </body>
 </html>
+
 
 
 
