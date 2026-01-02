@@ -524,19 +524,14 @@
 
 /* ✅ 各ボタンの“外枠” */
 .ctaFrame{
-  display:inline-flex;
-  padding: 6px;                 /* 枠の太さ：4〜8pxで好み調整 */
-  border-radius: 999px;
-  border: 1px solid rgba(255,255,255,.14);
-  background: rgba(0,0,0,.14);
-  backdrop-filter: blur(12px);
-  box-shadow: 0 18px 55px rgba(0,0,0,.22);
+  padding: 0;
+  border: none;
+  background: transparent;
+  backdrop-filter: none;
+  box-shadow: none;
 }
 
-/* 外枠があるので、ボタン側の影を少し抑えて二重感を減らす（任意） */
-.ctaFrame .btn{
-  box-shadow: 0 12px 30px rgba(0,0,0,.18);
-}
+/* 外枠があるので、ボタン側の影を少し抑えて二重感を減らす（任意） (削除済み) */
 
 /* スマホは縦積みに */
 @media (max-width: 680px){
@@ -552,27 +547,10 @@
     justify-content: center;
   }
 }
-.ctaFrame::before{
-  content:"";
-  position:absolute;
-  inset:-2px;
-  border-radius: inherit;
-  background: radial-gradient(240px 140px at 30% 30%, rgba(80,200,255,.16), transparent 60%);
-  opacity:.9;
-  pointer-events:none;
-}
-.ctaFrame{ position:relative; }
+/* .ctaFrame::before の不要な定義を削除 */
+/* .ctaFrame の不要な定義を削除 */
 
-/* ✅ 2ボタンだけ文字色を白に */
-.hero-actions .btn,
-.hero-actions .btn:visited,
-.hero-actions .btn:hover,
-.hero-actions .btn:active{
-  color:#fff;
-}
-.hero-actions .btn .mini{
-  color:rgba(255,255,255,.85);
-}
+/* .hero-actions .btn の重複定義を削除 */
 
 /* ✅ きょうのおみくじは白強制しない（必要なら任意色を指定） */
 .omikuji-link,
@@ -580,24 +558,7 @@
   color: inherit; /* もともとの色に戻す */
 }
 
-.hero-topline{
-  position:absolute;
-  top:18px;
-  right:18px;
-  z-index:5;
-
-  font-size:12px;
-  letter-spacing:.16em;
-  text-transform:uppercase;
-  color:rgba(255,255,255,.90);
-
-  padding:10px 14px;
-  border-radius:999px;
-  background:rgba(7,10,20,.35);
-  border:1px solid rgba(255,255,255,.16);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-}
+/* .hero-topline の重複定義を削除 */
 /* =========================
    きょうのおみくじ：右側へ（改善案B）
 ========================= */
@@ -798,8 +759,44 @@
 }
 .video-tint{ opacity: .88; }      /* 0.75〜0.95で好み調整 */
 .scanlines{ opacity: .07; }       /* スキャンラインも少し薄く */
-	
-	
+
+/* New Button Styles */
+.btn{
+  display:inline-flex; align-items:center; justify-content:center;
+  padding: 12px 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.16);
+  background: rgba(255,255,255,.08);
+  color: var(--text);
+  box-shadow: 0 18px 40px rgba(0,0,0,.25);
+  backdrop-filter: blur(12px);
+  transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+  will-change: transform;
+  font-weight:700;
+  position:relative;
+  overflow:hidden;
+}
+.btn::before{
+  content:"";
+  position:absolute; inset:-2px;
+  background: radial-gradient(240px 140px at var(--mx,50%) var(--my,50%),
+    rgba(80,200,255,.25), rgba(168,85,247,.20), transparent 60%);
+  opacity:0;
+  transition: opacity .15s ease;
+  pointer-events:none;
+}
+.btn:hover::before{opacity:1;}
+.btn:hover{
+  /* transform: translateY(-2px); */ /* magnetic と競合するため削除 */
+  background: rgba(255,255,255,.10);
+  box-shadow: 0 22px 70px rgba(0,0,0,.38);
+}
+.btn.primary{
+  border-color: rgba(80,200,255,.38);
+  background: linear-gradient(135deg, rgba(80,200,255,.22), rgba(168,85,247,.18));
+}
+.btn .mini{opacity:.8; font-weight:400; margin-left:8px; font-size:12px;}
+
 	</style>
 </head>
 
@@ -1413,30 +1410,3 @@ function updateParallax(){
   </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
