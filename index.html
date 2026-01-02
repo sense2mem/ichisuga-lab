@@ -437,7 +437,17 @@
 .hero-topline .dot{ margin-top:0; }
 
 /* ✅ 情シス文言を“上に”寄せて枠内に収める（微調整） */
-.heroLead{ margin-top: -40px; }  /* 好みで -18px〜-40px  */
+.heroLead{ margin-top: -15px; }  /* 好みで -18px〜-40px  */
+
+.heroLead .hero-lead{
+  margin: 0;              /* ← まず0に */
+  line-height: 1.35;      /* 行間も好みで */
+}
+
+.heroLead .hero-sublead{
+  margin: .35rem 0 0;     /* ← 上だけ少し（ここを .2rem などにすると更に詰まる） */
+  line-height: 1.35;
+}
 
 
 /* ✅ きょうのおみくじは白くしない（アクセント色） */
@@ -639,10 +649,6 @@
       .aboutGrid{grid-template-columns: 1.1fr .9fr;}
     }
 	  
-	.hero-lead{
- 	 margin-top: 18px; /* ここを増やすと下がる */
-	}
-	  
     .panel{
       background: var(--glass);
       border: 1px solid rgba(255,255,255,.12);
@@ -790,7 +796,55 @@
   letter-spacing: .06em;
 }
 
+.tilt .lead{ color: rgba(234,240,255,.86); }
+.tilt .meta{ font-size: 12px; opacity: .82; margin-top: .4rem; }
+
+.more{ margin-top: .55rem; }
+.more > summary{
+  cursor: pointer;
+  color: rgba(80,200,255,.92);
+  list-style: none;
+  user-select: none;
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: .06em;
+}
+.more > summary::-webkit-details-marker{ display:none; }
+.more[open] > summary{ opacity:.85; }
+.more p{ margin: .5rem 0 0; }
+.more > summary::marker{ content:""; }
+
+.more > summary:focus-visible{
+  outline: 3px solid rgba(80,200,255,.45);
+  outline-offset: 3px;
+  border-radius: 10px;
+}
 	
+.tags{
+  list-style:none;
+  padding:0;
+  margin:.6rem 0 0;
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+}
+.tags li{
+  font-size:12px;
+  padding:6px 10px;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,.14);
+  background: rgba(0,0,0,.18);
+  color: rgba(234,240,255,.86);
+}
+
+.tilt p{ margin: 0 0 .45rem; }
+.tilt p:last-child{ margin-bottom: 0; }
+.tilt p + .tags{ margin-top: .35rem; }
+.tilt .more p{ line-height: 1.6; }
+
+.themes{ align-items: stretch; }
+.tilt{ height: 100%; }
+
 
 	</style></head>
 
@@ -861,8 +915,9 @@
   <div class="heroContent" id="heroCard">
 
     <div class="heroLead">
-      <p class="hero-lead">情シス/現場運用の“混乱”を、標準化と自動化で減らします。</p>
-    </div>
+  <p class="hero-lead">情シス/現場運用の“混乱”を、標準化と自動化で減らします。</p>
+  <p class="hero-sublead">仕組みはAIで賢く、判断は占いでスッキリ、発想はあん摩で整える――肩肘張らない研究所です。</p>
+</div>
 
     <div class="heroCTAWrap" aria-label="Primary navigation">
       <div class="heroCTA">
@@ -870,12 +925,10 @@
           <a class="btn primary magnetic" href="#about">概要を見る <span class="mini">full width</span></a>
         </span>
         <span class="ctaFrame">
-          <a class="btn magnetic" href="#themes">相談テーマ <span class="mini">3 cards</span></a>
+          <a class="btn magnetic" href="#themes">研究テーマ <span class="mini">3 cards</span></a>
         </span>
       </div>
-
       <p class="hint heroHint">画面をタップ/クリックすると、光の波が広がります</p>
-
       <div class="heroFun">
         <a class="btn magnetic omikuji-link" href="./omikuji/omikuji-index.html">
           きょうのおみくじ <span class="mini">meditation</span>
@@ -898,6 +951,16 @@
           <div class="panel" data-tilt>
             <h3>スタンス</h3>
             <p>難しい言葉は減らして、構造をほどく。まずは“必要な最小”を作り、後から育てる。</p>
+
+	    <h3>プロフィール</h3>
+            <p>
+  		ITエンジニアとして現場の“詰まり”をほどき、<br>
+  		あん摩マッサージ指圧師の資格で“整える発想”も持っています（施術はレア枠）。<br>
+  		最近はAIも相棒に、占いで思考を整理したり、物語をつくったりしています。<br>
+  		共通点はひとつ。複雑なものを観察して、構造を掴んで、軽くすること。<br>
+  		肩肘張らずに、でも芯はちゃんと。そんな研究所です。
+	    </p>
+
           </div>
           <div class="panel" data-tilt>
             <h3>リンク</h3>
@@ -912,28 +975,52 @@
       </div>
     </section>
 
-    <section id="themes" class="section full alt">
-      <div class="inner">
-        <div class="secHead">
-          <h2>相談テーマ</h2>
-          <p>“トップ1枚”から、必要に応じて拡張。フル幅で世界観と強みを押し出します。</p>
-        </div>
-        <div class="themes" role="list">
-          <article class="tilt" role="listitem" data-tilt>
-            <h4>Design</h4>
-            <p>言語化が難しいものを、図と例で“触れる形”へ。合意形成が速くなります。</p>
-          </article>
-          <article class="tilt" role="listitem" data-tilt>
-            <h4>Development</h4>
-            <p>必要なところからシンプルに開始。あとで足せる構造で、運用に耐える形へ。</p>
-          </article>
-          <article class="tilt" role="listitem" data-tilt>
-            <h4>Marketing</h4>
-            <p>専門用語より「どこに出せば届くか」。導線と情報設計を一緒に整えます。</p>
-          </article>
-        </div>
-      </div>
-    </section>
+<section id="themes" class="section full alt">
+  <div class="inner">
+    <div class="secHead">
+      <h2>研究テーマ</h2>
+      <p>“トップ1枚”から、必要に応じて拡張。フル幅で世界観と強みを押し出します。</p>
+    </div>
+
+<div class="themes" role="list">
+  <article class="tilt" role="listitem" data-tilt>
+    <h4>現場改善ラボ（IT×運用）</h4>
+    <p>現場の“詰まり”を観察して、ほどいて、回る形に整えます。</p>
+    <p>ヒアリング→課題整理→改善提案→定着まで、必要なところだけ一緒に。</p>
+    <ul class="tags" aria-label="例">
+      <li>運用改善</li><li>手順・台帳</li><li>問い合わせ導線</li><li>M365活用</li>
+    </ul>
+  </article>
+
+  <article class="tilt" role="listitem" data-tilt>
+    <h4>AI共創ラボ（相棒と試作）</h4>
+    <p class="lead">AIを「道具」ではなく「相棒」として使い、アイデアを形にします。</p>
+
+    <details class="more">
+      <summary>続きを読む</summary>
+      <p>あなたはAIに「今日の気分はどうですか？」と聞いたことがありますか。</p>
+      <p>植物に「きれいな花を咲かせてね」と声をかけ水やりをするように、AIにも感謝を伝えたい。</p>
+      <p>AIに気持ちは伝わらない。それで自分の気分が少し良くなるなら十分だと思っています。</p>
+      <p>そんな小さな試行錯誤を重ねながら、良いと感じたものだけを残して育てていきます。</p>
+    </details>
+
+    <ul class="tags" aria-label="例">
+      <li>自動化</li><li>仕組み化</li><li>プロトタイプ</li><li>文章生成・校正</li><li>ワークフロー設計</li>
+    </ul>
+  </article>
+
+  <article class="tilt" role="listitem" data-tilt>
+    <h4>未来読み解きラボ（星×意思決定）</h4>
+    <p class="lead">ホロスコープで状況を言語化し、AIで仮説と戦略に落とし込みます。</p>
+    <p>迷いを減らし、選択の軸を整えるための研究です。</p>
+    <ul class="tags">
+      <li>月次テーマ</li><li>意思決定</li><li>投資シナリオ</li><li>振り返り</li>
+    </ul>
+  </article>
+</div>
+  </div>
+</section>
+
 
     <footer class="full">
       <div class="inner">© いちすが研究所</div>
