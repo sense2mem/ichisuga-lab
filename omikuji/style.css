@@ -800,3 +800,42 @@ h1::after{
             translateX(var(--fortune-char-x))
             translateY(var(--fortune-char-y, 0px));
 }
+/* 新しいボタンスタイル (index.html から移植) */
+.btn{
+  display:inline-flex; align-items:center; justify-content:center;
+  padding: 12px 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.16);
+  background: rgba(255,255,255,.08);
+  color: #eaf0ff; /* var(--text) を直接値に置換 */
+  box-shadow: 0 18px 40px rgba(0,0,0,.25);
+  backdrop-filter: blur(12px);
+  transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+  will-change: transform;
+  font-weight:700;
+  position:relative;
+  overflow:hidden;
+  text-decoration: none; /* aタグのデフォルト下線を消す */
+}
+.btn::before{
+  content:"";
+  position:absolute; inset:-2px;
+  /* var(--mx), var(--my) は omikuji/style.css にはないので、グラデーションを固定値に */
+  background: radial-gradient(240px 140px at 50% 50%,
+    rgba(80,200,255,.25), rgba(168,85,247,.20), transparent 60%);
+  opacity:0;
+  transition: opacity .15s ease;
+  pointer-events:none;
+}
+.btn:hover::before{opacity:1;}
+.btn:hover{
+  /* transform: translateY(-2px); */
+  background: rgba(255,255,255,.10);
+  box-shadow: 0 22px 70px rgba(0,0,0,.38);
+}
+.btn.primary{
+  /* var(--a1) は omikuji/style.css にはないので、直接値に置換 */
+  border-color: rgba(80,200,255,.38);
+  background: linear-gradient(135deg, rgba(80,200,255,.22), rgba(168,85,247,.18));
+}
+.btn .mini{opacity:.8; font-weight:400; margin-left:8px; font-size:12px;}
