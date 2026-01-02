@@ -95,7 +95,8 @@
     /* ---------------- HERO ---------------- */
     .hero{
       position:relative;
-      min-height: 860px;
+        /* min-height: 860px; ← これをやめて可変に */
+	　min-height: clamp(640px, 78vh, 780px);
       overflow:hidden;
       box-shadow: var(--shadow);
       isolation:isolate;
@@ -526,7 +527,42 @@
   pointer-events:none;
 }
 .ctaFrame{ position:relative; }
-	  
+
+/* ✅ 2ボタンだけ文字色を白に */
+.hero-actions .btn,
+.hero-actions .btn:visited,
+.hero-actions .btn:hover,
+.hero-actions .btn:active{
+  color:#fff;
+}
+.hero-actions .btn .mini{
+  color:rgba(255,255,255,.85);
+}
+
+/* ✅ きょうのおみくじは白強制しない（必要なら任意色を指定） */
+.omikuji-link,
+.omikuji-link:visited{
+  color: inherit; /* もともとの色に戻す */
+}
+
+.hero-topline{
+  position:absolute;
+  top:18px;
+  right:18px;
+  z-index:5;
+
+  font-size:12px;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  color:rgba(255,255,255,.90);
+
+  padding:10px 14px;
+  border-radius:999px;
+  background:rgba(7,10,20,.35);
+  border:1px solid rgba(255,255,255,.16);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
 /* =========================
    きょうのおみくじ：右側へ（改善案B）
 ========================= */
@@ -623,7 +659,11 @@
     @media (min-width: 980px){
       .aboutGrid{grid-template-columns: 1.1fr .9fr;}
     }
-
+	  
+	.hero-lead{
+ 	 margin-top: 18px; /* ここを増やすと下がる */
+	}
+	  
     .panel{
       background: var(--glass);
       border: 1px solid rgba(255,255,255,.12);
@@ -762,16 +802,15 @@
           <div class="kicker">
  			 <span class="dot" aria-hidden="true"></span>
  			 <span class="kickerText">
-	　 	   		 <span class="kickerMain">Touch It, It Talks</span>
-			    <span class="kickerSub">From Chaos to Clarity</span>
+	　 	   		 <div class="hero-topline">Touch It, It Talks - From Chaos to Clarity</div>
       	    </span>
 		</div>
 
 		<div class="heroLead">
-		  情シス/現場運用の“混乱”を、標準化と自動化で減らします。
+		  <p class="hero-lead">情シス/現場運用の“混乱”を、標準化と自動化で減らします。</p>
 		</div>
 　　<div class="heroCTAWrap" aria-label="Primary navigation">
-		<div class="heroCTA">
+		<div class="hero-actions">
   			<span class="ctaFrame">
    				 <a class="btn primary magnetic" href="#about">概要を見る <span class="mini">full width</span></a>
  			 </span>
@@ -1304,6 +1343,7 @@ function updateParallax(){
   </script>
 </body>
 </html>
+
 
 
 
