@@ -414,7 +414,7 @@
 
     .kicker{
       position:relative;
-      display:inline-flex; gap:10px; align-items:center;
+      display:inline-flex; gap:10px; align-items:flex-start;
       padding: 8px 12px;
       border-radius: 999px;
       border: 1px solid rgba(255,255,255,.16);
@@ -426,7 +426,48 @@
       width: fit-content;
       box-shadow: 0 12px 30px rgba(0,0,0,.22);
     }
-    .dot{
+/* 英語2行 kicker */
+.kicker{
+  display:flex;
+  align-items:flex-start;
+  gap:.6rem;
+}
+
+.kickerText{
+  display:block;
+  line-height:1.1;
+}
+
+.kickerMain{
+  display:block;
+  letter-spacing:.14em;
+}
+
+.kickerSub{
+  display:block;
+  margin-top:.28rem;
+  font-style:italic;
+  letter-spacing:.08em;
+  opacity:.82;
+}
+
+/* dotが上寄りに見える場合の微調整 */
+.kicker .dot{
+  margin-top:.22rem;
+}
+
+/* 日本語1行（英語の下に“約束”として置く） */
+.heroLead{
+  margin-top:.85rem;
+  max-width:56ch;
+  line-height:1.65;
+  opacity:.92;
+  /* 既存のタイポに合わせて必要なら */
+  /* font-size: clamp(14px, 1.6vw, 17px); */
+}
+	  
+	  
+	.dot{
       width:8px;height:8px;border-radius:999px;
       background: radial-gradient(circle at 30% 30%, #fff, var(--a1));
       box-shadow: 0 0 14px rgba(80,200,255,.65);
@@ -1225,6 +1266,7 @@ function updateParallax(){
   </script>
 </body>
 </html>
+
 
 
 
