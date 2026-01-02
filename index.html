@@ -784,6 +784,20 @@
 }
 .btn .mini{opacity:.8; font-weight:400; margin-left:8px; font-size:12px;}
 
+/* ボタンは下線を出さない */
+.btn, .btn:hover, .btn:focus-visible{
+  text-decoration: none;
+}
+
+/* .btn の後ろに置く */
+.btn.omikuji-link,
+.btn.omikuji-link:visited{
+  color: var(--a1);
+}
+.btn.omikuji-link .mini{
+  color: rgba(80,200,255,.85);
+}
+
 .hint.heroHint {
   position: relative;
   display: block;
