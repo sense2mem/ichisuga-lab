@@ -382,15 +382,15 @@
 .sticker.c{ left: 18px;  bottom: 22px; }
 .sticker.d{ right: 18px; bottom: 22px; }
 
-/* 下部にピタッと寄せる：推奨 */
-.heroWrap{
-  min-height: 100%;              /* ← HEROの高さぶん使う */
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;     /* ← 下寄せ確定 */
-  padding: 56px 0 calc(24px + env(safe-area-inset-bottom));
-  z-index: 7;
-}
+    /* 下部UI（CTA） */
+    .heroWrap{
+      min-height: 100%;           /* ← 860px固定をやめる */
+      display:grid;
+      align-items:end;
+      position: relative;
+      padding: 860px 0 24px;    /* ← 縦を少し圧縮 */
+      z-index: 7;
+    }
 
     .heroContent{
       position:relative;
@@ -1413,6 +1413,7 @@ function updateParallax(){
   </script>
 </body>
 </html>
+
 
 
 
