@@ -11,7 +11,35 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet" />
 
-  <style>
+  /* ===== 見せ場を広げて復活（上書き）===== */
+
+/* 1) HEROを少し広げる（まずここが効きます） */
+.hero{
+  min-height: clamp(760px, 92vh, 980px);
+}
+
+/* 2) 中央ロゴを少し上へ（カードと干渉しにくく） */
+.heroLogo{
+  top: 44%;            /* 52% → 44%（好みで 42〜48%） */
+}
+
+/* 3) 下部カードが“背景を殺しすぎない”ように透けを増やす */
+.heroContent{
+  background: rgba(0,0,0,.16);     /* 透けを増やす（読みやすさは維持） */
+  backdrop-filter: blur(10px);     /* 14px→10pxで“ぼかし過ぎ”を減らす */
+}
+.heroContent::before{
+  opacity: .72;                   /* 0.95→少し下げて背景を見せる */
+}
+
+/* 4) 暗幕を少し薄くして、動画/FXを見せる */
+.heroShade{
+  background: radial-gradient(1200px 860px at 60% 35%, rgba(0,0,0,.04), rgba(0,0,0,.48));
+}
+.video-tint{ opacity: .88; }      /* 0.75〜0.95で好み調整 */
+.scanlines{ opacity: .07; }       /* スキャンラインも少し薄く */
+
+	<style>
     :root{
       --bg0:#070a14;
       --bg1:#0b1026;
@@ -1384,6 +1412,7 @@ function updateParallax(){
   </script>
 </body>
 </html>
+
 
 
 
