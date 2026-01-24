@@ -96,7 +96,6 @@
       position:relative;
       display:flex;
       flex-direction:column;
-      /* ✅ 760px固定をやめてスマホでも自然に */
       min-height: clamp(620px, 100svh, 980px);
       overflow:hidden;
       box-shadow: var(--shadow);
@@ -322,7 +321,9 @@
       72%{ clip-path: inset(46% 0 0 0); }
     }
 
-    /* ✅ ステッカー：空白は透過・ステッカーだけ掴める */
+    /* =========================================================
+       ✅ 一旦削除：ステッカー関連CSS（必要なら後で復活）
+       =========================================================
     .stickers{ position:absolute; inset:0; z-index:9; pointer-events:none; }
     .sticker{
       pointer-events:auto;
@@ -344,8 +345,6 @@
       user-select: none;
       -webkit-user-select: none;
       touch-action: none;
-
-      /* ✅ はみ出し防止 */
       max-width: calc(100vw - 44px);
       white-space: nowrap;
       overflow: hidden;
@@ -353,11 +352,11 @@
     }
     .sticker:active{ cursor: grabbing; }
     .sticker.dragging{ z-index: 9999; }
-
     .sticker.a{ left: 18px;  top: var(--safeTop); }
     .sticker.b{ right: 18px; top: var(--safeTop); }
     .sticker.c{ left: 18px;  bottom: 22px; }
     .sticker.d{ right: 18px; bottom: 22px; }
+    ========================================================= */
 
     /* ✅ 右上の1行 */
     .hero-topline{
@@ -704,7 +703,7 @@
       html{scroll-behavior:auto;}
       #scene{display:none;}
       .bg-video{display:none;}
-      .fx-layer,.stickers,.scanlines{display:none;}
+      .fx-layer,.scanlines{display:none;}
       .tilt, .panel, .btn{transition:none !important; transform:none !important;}
     }
   </style>
@@ -750,12 +749,17 @@
       <p class="brandDesc">IT基盤・運用改善・自動化を軸に、言葉と身体の領域へ。</p>
     </div>
 
-    <div class="stickers" aria-hidden="true">
+    <!-- =========================================================
+         ✅ 一旦削除：ステッカー（遊び）
+         必要になったら、ここを復活させればOK
+         =========================================================
+    <nav class="stickers" aria-hidden="true">
       <div class="sticker a" data-parallax data-speed="0.12" data-mouse="1.10"><span class="emo">⚡</span> Automation</div>
       <div class="sticker b" data-parallax data-speed="0.10" data-mouse="1.00"><span class="emo">🧠</span> Structure</div>
       <div class="sticker c" data-parallax data-speed="0.14" data-mouse="1.20"><span class="emo">🛡️</span> Security</div>
       <div class="sticker d" data-parallax data-speed="0.11" data-mouse="1.05"><span class="emo">✨</span> Playful</div>
-    </div>
+    </nav>
+    ========================================================= -->
 
     <div class="hero-topline" aria-label="tagline">
       <span class="dot" aria-hidden="true"></span>
@@ -889,7 +893,6 @@
     }
   </script>
 
-  <!-- ✅ 以下のJSは原文ほぼそのまま（動作維持） -->
   <script type="module">
     import * as THREE from "three";
     import { RoomEnvironment } from "https://unpkg.com/three@0.159.0/examples/jsm/environments/RoomEnvironment.js";
@@ -922,7 +925,7 @@
       requestAnimationFrame(updateParallax);
     }
 
-    // ✅ 左上ブランドの高さに応じて、ステッカー/トップラインの開始位置を下げる
+    // ✅ 左上ブランドの高さに応じて、安全領域（--safeTop）を更新（トップライン等に利用）
     function updateSafeTop(){
       const brand = document.getElementById("brandTL");
       const r = brand?.getBoundingClientRect();
@@ -932,7 +935,9 @@
     updateSafeTop();
     window.addEventListener("resize", updateSafeTop, { passive:true });
 
-    // ✅ Draggable Stickers
+    /* =========================================================
+       ✅ 一旦削除：ステッカーのドラッグ処理（必要なら後で復活）
+       =========================================================
     const draggableStickers = Array.from(document.querySelectorAll(".sticker"));
 
     function makeStickerDraggable(el){
@@ -977,6 +982,7 @@
     }
 
     if (!reduceMotion) draggableStickers.forEach(makeStickerDraggable);
+       ========================================================= */
 
     function updateParallax(){
       rafPending = false;
@@ -984,7 +990,9 @@
       const mx = mouseX, my = mouseY;
 
       for (const el of parallaxEls) {
+        // ✅ drag機能を無効化しているので、この分岐は残しても害はありません
         if (el.classList.contains("dragging")) continue;
+
         const s = parseFloat(el.dataset.speed || "0.2");
         const m = parseFloat(el.dataset.mouse || "0.0");
         const ty = y * s * -0.12;
