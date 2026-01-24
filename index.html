@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>いちすが研究所</title>
   <meta name="description" content="3Dロゴ×フルスクリーン動画×パララックス×プレイアフル。" />
   <meta name="theme-color" content="#070a14" />
@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet" />
 
-	<style>
+  <style>
     :root{
       --bg0:#070a14;
       --bg1:#0b1026;
@@ -33,6 +33,9 @@
 
       --mx: 50%;
       --my: 50%;
+
+      /* ブランドの下を“安全領域”として使う（JSで更新） */
+      --safeTop: 150px;
     }
 
     *{box-sizing:border-box;}
@@ -47,10 +50,17 @@
         radial-gradient(1100px 800px at 85% 15%, rgba(80,200,255,.18), transparent 55%),
         radial-gradient(1200px 900px at 50% 110%, rgba(34,197,94,.12), transparent 55%),
         linear-gradient(180deg, var(--bg0), var(--bg1) 40%, var(--bg2));
-      overflow-x:hidden;
       -webkit-font-smoothing: antialiased;
       text-rendering: optimizeLegibility;
     }
+
+    /* ✅ 横ズレ対策（iOS含む） */
+    html, body { max-width: 100%; overflow-x: clip; }
+    @supports not (overflow-x: clip){
+      html, body { overflow-x: hidden; }
+    }
+
+    img, video, canvas { max-width: 100%; height: auto; display:block; }
 
     a{color:var(--a1); text-decoration:none;}
     a:hover{text-decoration:underline;}
@@ -67,11 +77,10 @@
     }
     .skip-link:focus{left:12px;}
 
-    /* フルブリード */
+    /* ✅ フルブリード（100vw廃止：横スクロール対策） */
     .full{
-      width: 100vw;
-      margin-left: calc(50% - 50vw);
-      margin-right: calc(50% - 50vw);
+      width: 100%;
+      margin: 0;
       position: relative;
     }
     .inner{
@@ -85,54 +94,48 @@
     /* ---------------- HERO ---------------- */
     .hero{
       position:relative;
-        /* min-height:860px; ← これをやめて可変に */
-      min-height: clamp(640px, 78vh, 780px);
+      display:flex;
+      flex-direction:column;
+      /* ✅ 760px固定をやめてスマホでも自然に */
+      min-height: clamp(620px, 100svh, 980px);
       overflow:hidden;
       box-shadow: var(--shadow);
       isolation:isolate;
       border-bottom: 1px solid rgba(255,255,255,.10);
     }
 
-/* ✅ フルスクリーン動画 */
-.bg-video{
-  position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  z-index:0;
+    /* ✅ フルスクリーン動画 */
+    .bg-video{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      z-index:0;
+      transform: scale(1.06) translate3d(0,0,0);
+      filter: saturate(1.2) contrast(1.08) brightness(.92);
+      will-change: transform;
+      opacity: 0;
+      transition: opacity .45s ease;
+    }
+    .bg-video.is-ready{ opacity: .92; }
 
-  /* ここは元の見た目（常時適用） */
-  transform: scale(1.06) translate3d(0,0,0);
-  filter: saturate(1.2) contrast(1.08) brightness(.92);
-  will-change: transform;
+    /* ✅ HERO中央ロゴ（画像） */
+    .heroLogo{
+      position:absolute;
+      left:50%;
+      top:44%;
+      transform: translate(-50%,-50%);
+      width: min(920px, 92vw);
+      height:auto;
+      z-index:6;
+      pointer-events:none;
+      user-select:none;
+      filter:
+        drop-shadow(0 20px 80px rgba(0,0,0,.55))
+        drop-shadow(0 0 28px rgba(80,200,255,.25));
+    }
 
-  /* フェードインだけ制御 */
-  opacity: 0;
-  transition: opacity .45s ease;
-}
-
-.bg-video.is-ready{
-  opacity: .92;
-}
-
-/* ✅ HERO中央ロゴ（画像） */
-.heroLogo{
-  position:absolute;
-  left:50%;
-  top:52%;
-  transform: translate(-50%,-50%);
-  width: min(920px, 92vw);
-  height:auto;
-  z-index:6;                /* ロゴを暗幕より上へ */
-  pointer-events:none;
-  user-select:none;
-  filter:
-    drop-shadow(0 20px 80px rgba(0,0,0,.55))
-    drop-shadow(0 0 28px rgba(80,200,255,.25));
-}
-  
-  /* 動画の上に“センセーショナル”な色味 */
     .video-tint{
       position:absolute; inset:0; z-index:1;
       background:
@@ -142,9 +145,9 @@
         linear-gradient(180deg, rgba(7,10,20,.22), rgba(7,10,20,.60));
       mix-blend-mode: screen;
       pointer-events:none;
+      opacity: .88;
     }
 
-    /* 3D canvas */
     #scene{
       position:absolute; inset:0;
       width:100%; height:100%;
@@ -153,7 +156,6 @@
       opacity:.99;
     }
 
-    /* パララックス：背面＆前面 */
     .fx-layer{
       position:absolute;
       inset:-25%;
@@ -176,17 +178,19 @@
     .blob.b2{width:580px;height:580px; right:-230px; top: 30px; background: radial-gradient(circle at 60% 40%, rgba(168,85,247,.92), transparent 60%);}
     .blob.b3{width:760px;height:760px; left: 25%; bottom:-450px; background: radial-gradient(circle at 40% 60%, rgba(34,197,94,.80), transparent 60%);}
 
+    [data-parallax]{ --px:0px; --py:0px; transform: translate3d(var(--px), var(--py), 0); }
+
     .gridlines{
       position:absolute; inset:-30%;
       background:
         linear-gradient(rgba(255,255,255,.07) 1px, transparent 1px),
         linear-gradient(90deg, rgba(255,255,255,.07) 1px, transparent 1px);
       background-size: 72px 72px;
-      transform: rotate(10deg);
       opacity:.12;
       mask-image: radial-gradient(closest-side at 55% 40%, rgba(0,0,0,.9), transparent 72%);
       -webkit-mask-image: radial-gradient(closest-side at 55% 40%, rgba(0,0,0,.9), transparent 72%);
       will-change: transform;
+      transform: translate3d(var(--px), var(--py), 0) rotate(10deg);
     }
 
     .streak{
@@ -195,10 +199,10 @@
       left:-40%;
       top: 56%;
       background: linear-gradient(90deg, transparent, rgba(80,200,255,.80), rgba(168,85,247,.80), transparent);
-      transform: rotate(-12deg);
       opacity:.55;
       filter: drop-shadow(0 0 22px rgba(80,200,255,.60));
       will-change: transform;
+      transform: translate3d(var(--px), var(--py), 0) rotate(-12deg);
     }
 
     .spark{
@@ -213,19 +217,9 @@
     .spark.s3{ left: 80%; top: 52%; width: 9px; height: 9px; opacity:.60; }
     .spark.s4{ left: 40%; top: 66%; width: 12px; height: 12px; opacity:.50; }
 
-/* パララックスは transform を直接上書きせず、変数で渡す */
-[data-parallax]{ --px:0px; --py:0px; transform: translate3d(var(--px), var(--py), 0); }
-
-/* 回転が必要なものは「translate + rotate」にする */
-.gridlines{ transform: translate3d(var(--px), var(--py), 0) rotate(10deg); }
-.streak{   transform: translate3d(var(--px), var(--py), 0) rotate(-12deg); }
-
-
-
-    /* スキャンライン（センセーショナル） */
     .scanlines{
       position:absolute; inset:0;
-      z-index:7;  /* スキャンラインは最前面でOK */
+      z-index:7;
       pointer-events:none;
       background: repeating-linear-gradient(
         to bottom,
@@ -234,24 +228,22 @@
         transparent 1px,
         transparent 5px
       );
-      opacity:.10;
+      opacity:.07;
       mix-blend-mode: overlay;
       transform: translate3d(0,0,0);
     }
 
-    /* HEROの暗幕（読みやすさ） */
     .heroShade{
       position:absolute; inset:0;
-      z-index:5;  /* 暗幕をロゴより下へ */
+      z-index:5;
       pointer-events:none;
-      background:
-        radial-gradient(1200px 860px at 60% 35%, rgba(0,0,0,.06), rgba(0,0,0,.64));
+      background: radial-gradient(1200px 860px at 60% 35%, rgba(0,0,0,.04), rgba(0,0,0,.48));
     }
 
-    /* ✅ 左上固定のブランドブロック（ご要望） */
+    /* ✅ 左上固定のブランドブロック */
     .brandTopLeft{
       position:absolute;
-      top: 16px;
+      top: calc(16px + env(safe-area-inset-top));
       left: 16px;
       z-index: 8;
       max-width: min(620px, calc(100vw - 32px));
@@ -276,7 +268,6 @@
       margin:0;
       font-size: 18px;
       letter-spacing:.08em;
-      text-transform: none;
     }
     .brandTagline{
       position:relative;
@@ -295,17 +286,10 @@
       line-height: 1.6;
     }
 
-    /* “グリッチっぽい”センセーショナル演出（軽量） */
-    .glitch{
-      position:relative;
-      display:inline-block;
-      filter: drop-shadow(0 0 18px rgba(80,200,255,.25));
-    }
-    .glitch::before,
-    .glitch::after{
+    .glitch{ position:relative; display:inline-block; filter: drop-shadow(0 0 18px rgba(80,200,255,.25)); }
+    .glitch::before, .glitch::after{
       content: attr(data-text);
-      position:absolute;
-      left:0; top:0;
+      position:absolute; left:0; top:0;
       width:100%;
       opacity:.55;
       pointer-events:none;
@@ -338,279 +322,191 @@
       72%{ clip-path: inset(46% 0 0 0); }
     }
 
-/* ✅ ステッカー：ドラッグ可能にする（重要） */
-/* ✅ 空白は透過、ステッカーだけ掴める */
-.stickers{
-  position:absolute;
-  inset:0;
-  z-index:9;
-  pointer-events:none;   /* ←空白を透過 */
-}
-.sticker{
-  pointer-events:auto;   /* ←ステッカーだけ反応 */
-  position:absolute;
+    /* ✅ ステッカー：空白は透過・ステッカーだけ掴める */
+    .stickers{ position:absolute; inset:0; z-index:9; pointer-events:none; }
+    .sticker{
+      pointer-events:auto;
+      position:absolute;
+      display:inline-flex;
+      gap:10px;
+      align-items:center;
+      padding: 10px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 20px 70px rgba(0,0,0,.30);
+      color: rgba(234,240,255,.92);
+      font-size: 12px;
+      letter-spacing:.05em;
+      opacity:.95;
+      cursor: grab;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
 
-  /* 見た目（元の“ステッカー感”）も復活させる */
-  display:inline-flex;
-  gap:10px;
-  align-items:center;
-  padding: 10px 12px;
-  border-radius: 999px;
-  border: 1px solid rgba(255,255,255,.14);
-  background: rgba(255,255,255,.06);
-  backdrop-filter: blur(12px);
-  box-shadow: 0 20px 70px rgba(0,0,0,.30);
-  color: rgba(234,240,255,.92);
-  font-size: 12px;
-  letter-spacing:.05em;
-  opacity:.95;
+      /* ✅ はみ出し防止 */
+      max-width: calc(100vw - 44px);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .sticker:active{ cursor: grabbing; }
+    .sticker.dragging{ z-index: 9999; }
 
-  cursor: grab;
-  user-select: none;
-  -webkit-user-select: none;
-  touch-action: none;
-}
-.sticker:active{ cursor: grabbing; }
-.sticker.dragging{ z-index: 9999; }
+    .sticker.a{ left: 18px;  top: var(--safeTop); }
+    .sticker.b{ right: 18px; top: var(--safeTop); }
+    .sticker.c{ left: 18px;  bottom: 22px; }
+    .sticker.d{ right: 18px; bottom: 22px; }
 
-/* ✅ 左上ブランドと被らない “安全な上余白” を使う */
-:root{ --safeTop: 150px; }
-
-/* ✅ 初期配置（a/b/c/d が効いてないと全部左上に被ります） */
-.sticker.a{ left: 18px;  top: var(--safeTop); }
-.sticker.b{ right: 18px; top: var(--safeTop); }
-.sticker.c{ left: 18px;  bottom: 22px; }
-.sticker.d{ right: 18px; bottom: 22px; }
+    /* ✅ 右上の1行 */
+    .hero-topline{
+      position:absolute;
+      top: calc(18px + env(safe-area-inset-top));
+      right:18px;
+      z-index:8;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      font-size:12px;
+      letter-spacing:.10em;
+      color: rgba(234,240,255,.90);
+      padding:10px 14px;
+      border-radius:999px;
+      background:rgba(7,10,20,.35);
+      border:1px solid rgba(255,255,255,.16);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+    .dot{
+      width:8px;height:8px;border-radius:999px;
+      background: radial-gradient(circle at 30% 30%, #fff, var(--a1));
+      box-shadow: 0 0 14px rgba(80,200,255,.65);
+    }
 
     /* 下部UI（CTA） */
     .heroWrap{
-  margin-top:auto; /* ←これが本体 */
-  padding: 0 0 calc(24px + env(safe-area-inset-bottom));
-  display:block;   /* grid下寄せは捨てる */
-  min-height: 0;   /* 100%は不要 */
-}
+      margin-top:auto;
+      padding: 0 0 calc(24px + env(safe-area-inset-bottom));
+      display:block;
+      min-height: 0;
+    }
 
     .heroContent{
-  position:relative;
-  max-width: clamp(900px, 90vw, 1440px); /* 横幅をさらに広く */
-  margin: 0 auto;
-  padding: 32px;
-  border-radius: calc(var(--radius) + 10px);
-  border: 1px solid rgba(255,255,255,.14);
-  background: rgba(0,0,0,.16);
-  backdrop-filter: blur(10px);
-  box-shadow: 0 26px 90px rgba(0,0,0,.38);
-  overflow:hidden;
-}
+      position:relative;
+      max-width: clamp(900px, 90vw, 1440px);
+      margin: 0 auto;
+      padding: 32px;
+      padding-bottom: 86px; /* おみくじ分の逃げ */
+      border-radius: calc(var(--radius) + 10px);
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.16);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 26px 90px rgba(0,0,0,.38);
+      overflow:hidden;
+    }
     .heroContent::before{
       content:"";
       position:absolute; inset:-2px;
       background: radial-gradient(760px 380px at var(--mx,50%) var(--my,50%),
         rgba(80,200,255,.22), rgba(168,85,247,.18), rgba(34,197,94,.12), transparent 62%);
-      opacity:.95;
+      opacity:.72;
       pointer-events:none;
     }
 
-/* ✅ 右上1行 */
-.hero-topline{
-  position:absolute;
-  top:18px;
-  right:18px;
-  z-index:8;
+    .heroLead{ margin-top: -15px; }
+    .heroLead .hero-lead{ margin: 0; line-height: 1.35; }
+    .heroLead .hero-sublead{ margin: .35rem 0 0; line-height: 1.35; }
 
-  display:flex;
-  align-items:center;
-  gap:10px;
+    .heroCTA{
+      position:relative;
+      margin-top: 14px;
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
 
-  font-size:12px;
-  letter-spacing:.10em;
-  text-transform: none;
-  color: rgba(234,240,255,.90);
+    .ctaFrame{ padding:0; border:none; background:transparent; }
 
-  padding:10px 14px;
-  border-radius:999px;
-  background:rgba(7,10,20,.35);
-  border:1px solid rgba(255,255,255,.16);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-}
-.hero-topline .dot{ margin-top:0; }
+    .heroHint{
+      position: relative;
+      display: block;
+      text-align: left;
+      width: 100%;
+      margin-top: 30px;
+      opacity: 1;
+      color: rgba(234,240,255,.66);
+      font-size: 12px;
+      letter-spacing: .06em;
+    }
 
-/* ✅ 情シス文言を“上に”寄せて枠内に収める（微調整） */
-.heroLead{ margin-top: -15px; }  /* 好みで -18px〜-40px  */
+    .heroFun{
+      position:absolute;
+      right: 16px;
+      bottom: 16px;
+      z-index: 2;
+    }
 
-.heroLead .hero-lead{
-  margin: 0;              /* ← まず0に */
-  line-height: 1.35;      /* 行間も好みで */
-}
+    /* Button Styles */
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center;
+      padding: 12px 16px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.16);
+      background: rgba(255,255,255,.08);
+      color: var(--text);
+      box-shadow: 0 18px 40px rgba(0,0,0,.25);
+      backdrop-filter: blur(12px);
+      transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+      will-change: transform;
+      font-weight:700;
+      position:relative;
+      overflow:hidden;
+      text-decoration: none;
+    }
+    .btn::before{
+      content:"";
+      position:absolute; inset:-2px;
+      background: radial-gradient(240px 140px at var(--mx,50%) var(--my,50%),
+        rgba(80,200,255,.25), rgba(168,85,247,.20), transparent 60%);
+      opacity:0;
+      transition: opacity .15s ease;
+      pointer-events:none;
+    }
+    .btn:hover::before{opacity:1;}
+    .btn:hover{
+      background: rgba(255,255,255,.10);
+      box-shadow: 0 22px 70px rgba(0,0,0,.38);
+      text-decoration: none;
+    }
+    .btn.primary{
+      border-color: rgba(80,200,255,.38);
+      background: linear-gradient(135deg, rgba(80,200,255,.22), rgba(168,85,247,.18));
+    }
+    .btn .mini{opacity:.8; font-weight:400; margin-left:8px; font-size:12px;}
 
-.heroLead .hero-sublead{
-  margin: .35rem 0 0;     /* ← 上だけ少し（ここを .2rem などにすると更に詰まる） */
-  line-height: 1.35;
-}
+    .omikuji-link, .omikuji-link:visited{ color: var(--a1); }
+    .omikuji-link .mini{ color: rgba(80,200,255,.85); }
 
+    /* ✅ about 背景 */
+    #about{ position: relative; overflow: hidden; }
+    #about::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background-image: url("https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=1600&q=60");
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      opacity: .18;
+      filter: saturate(1.1) contrast(1.1) brightness(.75);
+      transform: scale(1.06);
+      z-index: 0;
+    }
+    #about .inner{ position: relative; z-index: 1; }
 
-/* ✅ きょうのおみくじは白くしない（アクセント色） */
-.omikuji-link,
-.omikuji-link:visited{ color: var(--a1); }
-.omikuji-link .mini{ color: rgba(80,200,255,.85); }
-
-/* スマホでブランドが横幅を使う場合、キャッチを下に逃がす */
-@media (max-width: 680px){
-  .hero-topline{ top: calc(var(--safeTop) + 8px); }
-}
-	  
-/* =========================
-   kicker（英語2行）
-========================= */
-.kicker{
-  position:relative;
-  display:inline-flex;
-  gap:10px;
-  align-items:flex-start; /* dotと1行目を揃える */
-  padding: 8px 12px;
-  border-radius: 999px;
-  border: 1px solid rgba(255,255,255,.16);
-  background: rgba(0,0,0,.20);
-  color: rgba(234,240,255,.92);
-  font-size: 12px;
-  letter-spacing:.10em;
-  text-transform: uppercase;
-  width: fit-content;
-  box-shadow: 0 12px 30px rgba(0,0,0,.22);
-}
-
-.kickerText{
-  display:flex;
-  flex-direction:column;
-  line-height:1.1;
-  transform: translateY(-1px); /* “少し上”に。-2pxまで好みで */
-}
-.kickerMain{ display:block; letter-spacing:.14em; }
-.kickerSub{
-  display:block;
-  margin-top:.28rem;
-  font-style:italic;
-  letter-spacing:.08em;
-  opacity:.82;
-  /* サブ行だけ大文字をやめたいなら↓ */
-  /* text-transform:none; */
-}
-
-.dot{
-  width:8px;height:8px;border-radius:999px;
-  background: radial-gradient(circle at 30% 30%, #fff, var(--a1));
-  box-shadow: 0 0 14px rgba(80,200,255,.65);
-  margin-top:.22rem; /* dotの微調整 */
-}
-
-
-
-/* =========================
-   CTA：修正
-========================= */
-.heroCTA{
-  position:relative;
-  margin-top: 14px;
-
-  display:flex;
-  gap:12px;
-  flex-wrap:wrap;
-  align-items:center;
-}
-
-/* ✅ 各ボタンの“外枠” */
-.ctaFrame{
-  padding: 0;
-  border: none;
-  background: transparent;
-  backdrop-filter: none;
-  box-shadow: none;
-}
-
-/* 外枠があるので、ボタン側の影を少し抑えて二重感を減らす（任意） (削除済み) */
-
-/* スマホは縦積みに */
-@media (max-width: 680px){
-  .heroCTA{
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  .ctaFrame{
-    width: 100%;
-  }
-  .ctaFrame .btn{
-    width: 100%;
-    justify-content: center;
-  }
-}
-/* .ctaFrame::before の不要な定義を削除 */
-/* .ctaFrame の不要な定義を削除 */
-
-
-/* ✅ きょうのおみくじは白強制しない（必要なら任意色を指定） */
-.omikuji-link,
-.omikuji-link:visited{ color: var(--a1); }
-.omikuji-link .mini{ color: rgba(80,200,255,.85); }
-
-/* .hero-topline の重複定義を削除 */
-/* =========================
-   きょうのおみくじ：右側へ（改善案B）
-========================= */
-.heroContent{
-  padding-bottom: 86px; /* おみくじボタン分の逃げ */
-}
-.heroFun{
-  position:absolute;
-  right: 16px;
-  bottom: 16px;
-  z-index: 2;
-}
-
-.heroFun .btn{
-  padding: 10px 14px;   /* 少し小さめ */
-  font-weight: 700;
-  opacity: .95;
-}
-
-/* スマホは詰まりやすいので下へ逃がす */
-@media (max-width: 680px){
-  .heroFun{
-    position: static;
-    margin-top: 12px;
-  }
-}
-
-
-/* ✅ 「概要」セクションの背面に画像を敷く */
-#about{
-  position: relative;
-  overflow: hidden;      /* はみ出し防止（既に .section にあるが念のため） */
-}
-
-/* 背景画像レイヤ */
-#about::before{
-  content:"";
-  position:absolute;
-  inset:0;
-  background-image: url("https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=1600&q=60");
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-
-  opacity: .18;          /* ←濃さはここで調整 */
-  filter: saturate(1.1) contrast(1.1) brightness(.75);
-  transform: scale(1.06); /* 端のチラつき対策 */
-  z-index: 0;
-}
-
-/* 文字・カードを背景より前に出す */
-#about .inner{
-  position: relative;
-  z-index: 1;
-}
-
-    /* ---------------- Sections ---------------- */
+    /* Sections */
     .section{
       padding: 54px 0;
       border-bottom: 1px solid rgba(255,255,255,.08);
@@ -648,7 +544,7 @@
     @media (min-width: 980px){
       .aboutGrid{grid-template-columns: 1.1fr .9fr;}
     }
-	  
+
     .panel{
       background: var(--glass);
       border: 1px solid rgba(255,255,255,.12);
@@ -677,6 +573,7 @@
       display:grid;
       grid-template-columns: 1fr;
       gap: 14px;
+      align-items: stretch;
     }
     @media (min-width: 860px){
       .themes{grid-template-columns: 1fr 1fr 1fr;}
@@ -693,6 +590,7 @@
       transition: transform .18s ease, box-shadow .18s ease;
       overflow:hidden;
       min-height: 170px;
+      height:100%;
     }
     .tilt::before{
       content:"";
@@ -707,11 +605,99 @@
     .tilt h4{margin:0 0 10px; font-size: 18px; transform: translateZ(18px); letter-spacing:.02em;}
     .tilt p{margin:0; color: var(--muted); font-size: 14px; line-height:1.7; transform: translateZ(14px);}
 
+    .tilt .lead{ color: rgba(234,240,255,.86); }
+
+    .more{ margin-top: .55rem; }
+    .more > summary{
+      cursor: pointer;
+      color: rgba(80,200,255,.92);
+      list-style: none;
+      user-select: none;
+      font-weight: 700;
+      font-size: 12px;
+      letter-spacing: .06em;
+    }
+    .more > summary::-webkit-details-marker{ display:none; }
+    .more[open] > summary{ opacity:.85; }
+    .more p{ margin: .5rem 0 0; line-height: 1.6; }
+    .more > summary:focus-visible{
+      outline: 3px solid rgba(80,200,255,.45);
+      outline-offset: 3px;
+      border-radius: 10px;
+    }
+
+    .tags{
+      list-style:none;
+      padding:0;
+      margin:.6rem 0 0;
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+    }
+    .tags li{
+      font-size:12px;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.18);
+      color: rgba(234,240,255,.86);
+    }
+
     footer{
       padding: 26px 0 36px;
       text-align:center;
       color: rgba(234,240,255,.55);
       font-size: 13px;
+    }
+
+    /* ✅ スマホ最適化 */
+    @media (max-width: 680px){
+      .inner{ padding: 0 14px; }
+
+      .brandTopLeft{
+        left: 10px;
+        right: 10px;
+        max-width: none;
+        top: calc(10px + env(safe-area-inset-top));
+        padding: 12px 12px 10px;
+      }
+      .brandDesc{ font-size: 12px; }
+
+      .heroLogo{
+        width: min(640px, 88vw);
+        top: 38%;
+      }
+
+      .hero-topline{
+        left: 10px;
+        right: 10px;
+        top: calc(var(--safeTop) + 8px);
+        justify-content:center;
+        text-align:center;
+        font-size: 11px;
+      }
+
+      .heroContent{
+        padding: 18px;
+        padding-bottom: 18px;
+      }
+      .heroLead{ margin-top: 0; } /* ✅ 負のmarginを無効化 */
+
+      .heroCTA{
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .ctaFrame{ width: 100%; }
+      .ctaFrame .btn{ width:100%; justify-content:center; }
+
+      .heroFun{
+        position: static;
+        margin-top: 12px;
+      }
+    }
+
+    @media (max-width: 420px){
+      .heroLogo{ top: 34%; }
     }
 
     @media (prefers-reduced-motion: reduce){
@@ -721,186 +707,19 @@
       .fx-layer,.stickers,.scanlines{display:none;}
       .tilt, .panel, .btn{transition:none !important; transform:none !important;}
     }
-  /* ===== 見せ場を広げて復活（上書き）===== */
-
-/* 1) HEROを少し広げる（まずここが効きます） */
-.hero{
-  display:flex;
-  flex-direction:column;
-  min-height: clamp(760px, 92svh, 980px); /* svh推奨（スマホで安定） */
-}
-
-/* 2) 中央ロゴを少し上へ（カードと干渉しにくく） */
-.heroLogo{
-  top: 44%;            /* 52% → 44%（好みで 42〜48%） */
-}
-
-/* 3) 下部カードが“背景を殺しすぎない”ように透けを増やす (マージ済み) */
-.heroContent::before{
-  opacity: .72;                   /* 0.95→少し下げて背景を見せる */
-}
-
-/* 4) 暗幕を少し薄くして、動画/FXを見せる */
-.heroShade{
-  background: radial-gradient(1200px 860px at 60% 35%, rgba(0,0,0,.04), rgba(0,0,0,.48));
-}
-.video-tint{ opacity: .88; }      /* 0.75〜0.95で好み調整 */
-.scanlines{ opacity: .07; }       /* スキャンラインも少し薄く */
-
-/* New Button Styles */
-.btn{
-  display:inline-flex; align-items:center; justify-content:center;
-  padding: 12px 16px;
-  border-radius: 999px;
-  border: 1px solid rgba(255,255,255,.16);
-  background: rgba(255,255,255,.08);
-  color: var(--text);
-  box-shadow: 0 18px 40px rgba(0,0,0,.25);
-  backdrop-filter: blur(12px);
-  transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
-  will-change: transform;
-  font-weight:700;
-  position:relative;
-  overflow:hidden;
-}
-.btn::before{
-  content:"";
-  position:absolute; inset:-2px;
-  background: radial-gradient(240px 140px at var(--mx,50%) var(--my,50%),
-    rgba(80,200,255,.25), rgba(168,85,247,.20), transparent 60%);
-  opacity:0;
-  transition: opacity .15s ease;
-  pointer-events:none;
-}
-.btn:hover::before{opacity:1;}
-.btn:hover{
-  /* transform: translateY(-2px); */ /* magnetic と競合するため削除 */
-  background: rgba(255,255,255,.10);
-  box-shadow: 0 22px 70px rgba(0,0,0,.38);
-}
-.btn.primary{
-  border-color: rgba(80,200,255,.38);
-  background: linear-gradient(135deg, rgba(80,200,255,.22), rgba(168,85,247,.18));
-}
-.btn .mini{opacity:.8; font-weight:400; margin-left:8px; font-size:12px;}
-
-/* ボタンは下線を出さない */
-.btn, .btn:hover, .btn:focus-visible{
-  text-decoration: none;
-}
-
-/* .btn の後ろに置く */
-.btn.omikuji-link,
-.btn.omikuji-link:visited{
-  color: var(--a1);
-}
-.btn.omikuji-link .mini{
-  color: rgba(80,200,255,.85);
-}
-
-.hint.heroHint {
-  position: relative;
-  display: block;
-  text-align: left; /* 左揃えに変更 */
-  width: 100%;
-  margin-top: 30px;
-  opacity: 1;
-  color: rgba(234,240,255,.66);
-  font-size: 12px;
-  letter-spacing: .06em;
-}
-
-.tilt .lead{ color: rgba(234,240,255,.86); }
-.tilt .meta{ font-size: 12px; opacity: .82; margin-top: .4rem; }
-
-.more{ margin-top: .55rem; }
-.more > summary{
-  cursor: pointer;
-  color: rgba(80,200,255,.92);
-  list-style: none;
-  user-select: none;
-  font-weight: 700;
-  font-size: 12px;
-  letter-spacing: .06em;
-}
-.more > summary::-webkit-details-marker{ display:none; }
-.more[open] > summary{ opacity:.85; }
-.more p{ margin: .5rem 0 0; }
-.more > summary::marker{ content:""; }
-
-.more > summary:focus-visible{
-  outline: 3px solid rgba(80,200,255,.45);
-  outline-offset: 3px;
-  border-radius: 10px;
-}
-	
-.tags{
-  list-style:none;
-  padding:0;
-  margin:.6rem 0 0;
-  display:flex;
-  flex-wrap:wrap;
-  gap:8px;
-}
-.tags li{
-  font-size:12px;
-  padding:6px 10px;
-  border-radius:999px;
-  border:1px solid rgba(255,255,255,.14);
-  background: rgba(0,0,0,.18);
-  color: rgba(234,240,255,.86);
-}
-
-.tilt p{ margin: 0 0 .45rem; }
-.tilt p:last-child{ margin-bottom: 0; }
-.tilt p + .tags{ margin-top: .35rem; }
-.tilt .more p{ line-height: 1.6; }
-
-.themes{ align-items: stretch; }
-.tilt{ height: 100%; }
-
-/* 既存のタグリンク共通 */
-.tags .tag-link{
-  display:inline-block;
-  text-decoration:none;
-  color:inherit;
-}
-
-/* ✅ 大きいボタン版 */
-.tags .tag-link--lg{
-  font-size:1.05rem;       /* 文字を少し大きく */
-  padding:12px 18px;       /* クリック領域を拡大 */
-  border-radius:999px;     /* タグ風の丸み */
-  border:1px solid rgba(255,255,255,.22);
-  background:rgba(255,255,255,.06);
-}
-
-/* ホバー時（任意） */
-.tags .tag-link--lg:hover{
-  background:rgba(255,255,255,.10);
-}
-
-/* キーボード操作の視認性（任意） */
-.tags .tag-link--lg:focus-visible{
-  outline:2px solid currentColor;
-  outline-offset:3px;
-}
-
-	</style></head>
+  </style>
+</head>
 
 <body>
   <a class="skip-link" href="#content">本文へスキップ</a>
 
   <header class="hero full" id="hero" role="banner">
-    <!-- ✅ フルスクリーン動画（ここが見えるようになります） -->
     <video class="bg-video" autoplay muted playsinline loop preload="metadata"
       poster="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=1600&q=60">
-      <!-- 好きな動画URLに差し替えOK -->
       <source src="https://assets.mixkit.co/videos/preview/mixkit-digital-animation-of-a-colorful-wavy-background-47783-large.mp4" type="video/mp4">
     </video>
     <div class="video-tint" aria-hidden="true"></div>
 
-    <!-- 背面パララックス -->
     <div class="fx-layer fx-back" data-parallax data-speed="0.18" data-mouse="0.35" aria-hidden="true">
       <div class="blob b1" data-parallax data-speed="0.14" data-mouse="0.55"></div>
       <div class="blob b2" data-parallax data-speed="0.12" data-mouse="0.48"></div>
@@ -908,15 +727,10 @@
       <div class="gridlines" data-parallax data-speed="0.08" data-mouse="0.35"></div>
     </div>
 
-    <!-- 3D -->
     <canvas id="scene" aria-hidden="true"></canvas>
 
-<!-- ✅ ロゴ画像を重ねる -->
-<img class="heroLogo" src="./ichisuga-lab.png" alt="ICHISUGA LAB">
+    <img class="heroLogo" src="./ichisuga-lab.png" alt="ICHISUGA LAB">
 
-
-
-    <!-- 前面パララックス -->
     <div class="fx-layer fx-front" data-parallax data-speed="0.10" data-mouse="0.78" aria-hidden="true">
       <div class="streak" data-parallax data-speed="0.16" data-mouse="0.75"></div>
       <div class="spark s1" data-parallax data-speed="0.12" data-mouse="0.95"></div>
@@ -928,7 +742,6 @@
     <div class="scanlines" aria-hidden="true"></div>
     <div class="heroShade" aria-hidden="true"></div>
 
-    <!-- ✅ 左上に固定配置（ご指定文言） -->
     <div class="brandTopLeft" id="brandTL" aria-label="サイト見出し">
       <h1 class="brandTitle">いちすが研究所</h1>
       <div class="brandTagline">
@@ -937,7 +750,6 @@
       <p class="brandDesc">IT基盤・運用改善・自動化を軸に、言葉と身体の領域へ。</p>
     </div>
 
-    <!-- ステッカー（遊び） -->
     <div class="stickers" aria-hidden="true">
       <div class="sticker a" data-parallax data-speed="0.12" data-mouse="1.10"><span class="emo">⚡</span> Automation</div>
       <div class="sticker b" data-parallax data-speed="0.10" data-mouse="1.00"><span class="emo">🧠</span> Structure</div>
@@ -945,40 +757,37 @@
       <div class="sticker d" data-parallax data-speed="0.11" data-mouse="1.05"><span class="emo">✨</span> Playful</div>
     </div>
 
-<div class="hero-topline" aria-label="tagline">
-  <span class="dot" aria-hidden="true"></span>
-  Touch It, It Talks - From Chaos to Clarity
-</div>
-
-<!-- 下部CTA（プレイアフルな操作・クリック波紋あり） -->
-<div class="inner heroWrap">
-  <div class="heroContent" id="heroCard">
-
-    <div class="heroLead">
-  <p class="hero-lead">情シス/現場運用の“混乱”を、標準化と自動化で減らします。</p>
-  <p class="hero-sublead">仕組みはAIで賢く、判断は占いでスッキリ、発想はあん摩で整える――肩肘張らない研究所です。</p>
-</div>
-
-    <div class="heroCTAWrap" aria-label="Primary navigation">
-      <div class="heroCTA">
-        <span class="ctaFrame">
-          <a class="btn primary magnetic" href="#about">概要を見る <span class="mini">full width</span></a>
-        </span>
-        <span class="ctaFrame">
-          <a class="btn magnetic" href="#themes">研究テーマ <span class="mini">3 cards</span></a>
-        </span>
-      </div>
-      <p class="hint heroHint">画面をタップ/クリックすると、光の波が広がります</p>
-      <div class="heroFun">
-        <a class="btn magnetic omikuji-link" href="./omikuji/omikuji-index.html">
-          きょうのおみくじ <span class="mini">meditation</span>
-        </a>
-      </div>
+    <div class="hero-topline" aria-label="tagline">
+      <span class="dot" aria-hidden="true"></span>
+      Touch It, It Talks - From Chaos to Clarity
     </div>
 
-  </div>
-</div>
-</header>
+    <div class="inner heroWrap">
+      <div class="heroContent" id="heroCard">
+        <div class="heroLead">
+          <p class="hero-lead">情シス/現場運用の“混乱”を、標準化と自動化で減らします。</p>
+          <p class="hero-sublead">仕組みはAIで賢く、判断は占いでスッキリ、発想はあん摩で整える――肩肘張らない研究所です。</p>
+        </div>
+
+        <div class="heroCTAWrap" aria-label="Primary navigation">
+          <div class="heroCTA">
+            <span class="ctaFrame">
+              <a class="btn primary magnetic" href="#about">概要を見る <span class="mini">full width</span></a>
+            </span>
+            <span class="ctaFrame">
+              <a class="btn magnetic" href="#themes">研究テーマ <span class="mini">3 cards</span></a>
+            </span>
+          </div>
+          <p class="hint heroHint">画面をタップ/クリックすると、光の波が広がります</p>
+          <div class="heroFun">
+            <a class="btn magnetic omikuji-link" href="./omikuji/omikuji-index.html">
+              きょうのおみくじ <span class="mini">meditation</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
 
   <main id="content">
     <section id="about" class="section full">
@@ -992,95 +801,95 @@
             <h3>スタンス</h3>
             <p>難しい言葉は減らして、構造をほどく。まずは“必要な最小”を作り、後から育てる。</p>
 
-	    <h3>プロフィール</h3>
+            <h3>プロフィール</h3>
             <p>
-  		ITエンジニアとして現場の“詰まり”をほどき、<br>
-  		あん摩マッサージ指圧師の資格で“整える発想”も持っています（施術はレア枠）。<br>
-  		最近はAIも相棒に、占いで思考を整理したり、物語をつくったりしています。<br>
-  		共通点はひとつ。複雑なものを観察して、構造を掴んで、軽くすること。<br>
-  		肩肘張らずに、でも芯はちゃんと。そんな研究所です。
-	    </p>
-
+              ITエンジニアとして現場の“詰まり”をほどき、<br>
+              あん摩マッサージ指圧師の資格で“整える発想”も持っています（施術はレア枠）。<br>
+              最近はAIも相棒に、占いで思考を整理したり、物語をつくったりしています。<br>
+              共通点はひとつ。複雑なものを観察して、構造を掴んで、軽くすること。<br>
+              肩肘張らずに、でも芯はちゃんと。そんな研究所です。
+            </p>
           </div>
+
           <div class="panel" data-tilt>
             <h3>リンク</h3>
             <ul>
               <li><a href="https://github.com/" target="_blank" rel="noopener noreferrer">GitHub</a></li>
               <li><a href="https://x.com/" target="_blank" rel="noopener noreferrer">SNS（X）</a></li>
             </ul>
-            <h3 style="margin-top:16px;">連絡</h3>
-<p>以下のフォームよりお問い合せください。</p>
 
-<a class="btn magnetic omikuji-link" href="https://forms.office.com/r/902YpxzxNr" target="_blank" rel="noopener" style="margin-top: 8px; display: inline-block;">
-      お問い合せ
-</a>
+            <h3 style="margin-top:16px;">連絡</h3>
+            <p>以下のフォームよりお問い合せください。</p>
+
+            <a class="btn magnetic omikuji-link" href="https://forms.office.com/r/902YpxzxNr" target="_blank" rel="noopener" style="margin-top: 8px; display: inline-block;">
+              お問い合せ
+            </a>
           </div>
         </div>
       </div>
     </section>
 
-<section id="themes" class="section full alt">
-  <div class="inner">
-    <div class="secHead">
-      <h2>研究テーマ</h2>
-      <p>“トップ1枚”から、必要に応じて拡張。フル幅で世界観と強みを押し出します。</p>
-    </div>
+    <section id="themes" class="section full alt">
+      <div class="inner">
+        <div class="secHead">
+          <h2>研究テーマ</h2>
+          <p>“トップ1枚”から、必要に応じて拡張。フル幅で世界観と強みを押し出します。</p>
+        </div>
 
-<div class="themes" role="list">
-  <article class="tilt" role="listitem" data-tilt>
-    <h4>現場改善ラボ（IT×運用）</h4>
-    <p>現場の“詰まり”を観察して、ほどいて、回る形に整えます。</p>
-    <p>ヒアリング→課題整理→改善提案→定着まで、必要なところだけ一緒に。</p>
-    <ul class="tags" aria-label="例">
-      <li>運用改善</li><li>手順・台帳</li><li>問い合わせ導線</li><li>M365活用</li>
-    </ul>
-  </article>
+        <div class="themes" role="list">
+          <article class="tilt" role="listitem" data-tilt>
+            <h4>現場改善ラボ（IT×運用）</h4>
+            <p>現場の“詰まり”を観察して、ほどいて、回る形に整えます。</p>
+            <p>ヒアリング→課題整理→改善提案→定着まで、必要なところだけ一緒に。</p>
+            <ul class="tags" aria-label="例">
+              <li>運用改善</li><li>手順・台帳</li><li>問い合わせ導線</li><li>M365活用</li>
+            </ul>
+          </article>
 
-  <article class="tilt" role="listitem" data-tilt>
-    <h4>AI共創ラボ（相棒と試作）</h4>
-    <p class="lead">AIを「道具」ではなく「相棒」として使い、アイデアを形にします。</p>
+          <article class="tilt" role="listitem" data-tilt>
+            <h4>AI共創ラボ（相棒と試作）</h4>
+            <p class="lead">AIを「道具」ではなく「相棒」として使い、アイデアを形にします。</p>
 
-    <details class="more">
-      <summary>続きを読む</summary>
-      <p>あなたはAIに「今日の気分はどうですか？」と聞いたことがありますか。</p>
-      <p>植物に「きれいな花を咲かせてね」と声をかけ水やりをするように、AIにも感謝を伝えたい。</p>
-      <p>AIに気持ちは伝わらない。それで自分の気分が少し良くなるなら十分だと思っています。</p>
-      <p>そんな小さな試行錯誤を重ねながら、良いと感じたものだけを残して育てていきます。</p>
-    </details>
+            <details class="more">
+              <summary>続きを読む</summary>
+              <p>あなたはAIに「今日の気分はどうですか？」と聞いたことがありますか。</p>
+              <p>植物に「きれいな花を咲かせてね」と声をかけ水やりをするように、AIにも感謝を伝えたい。</p>
+              <p>AIに気持ちは伝わらない。それで自分の気分が少し良くなるなら十分だと思っています。</p>
+              <p>そんな小さな試行錯誤を重ねながら、良いと感じたものだけを残して育てていきます。</p>
+            </details>
 
-    <ul class="tags" aria-label="例">
-      <li>自動化</li><li>仕組み化</li><li>プロトタイプ</li><li>文章生成・校正</li><li>ワークフロー設計</li>
-    </ul>
-  </article>
+            <ul class="tags" aria-label="例">
+              <li>自動化</li><li>仕組み化</li><li>プロトタイプ</li><li>文章生成・校正</li><li>ワークフロー設計</li>
+            </ul>
+          </article>
 
-  <article class="tilt" role="listitem" data-tilt>
-    <h4>未来読み解きラボ（星×意思決定）</h4>
-    <p class="lead">ホロスコープで状況を言語化し、AIで仮説と戦略に落とし込みます。</p>
-    <p>迷いを減らし、選択の軸を整えるための研究です。</p>
-    <ul class="tags">
-      <li>月次テーマ</li><li>意思決定</li><li>投資シナリオ</li><li>振り返り</li>
-    </ul>
-  </article>
-</div>
-  </div>
-</section>
-
+          <article class="tilt" role="listitem" data-tilt>
+            <h4>未来読み解きラボ（星×意思決定）</h4>
+            <p class="lead">ホロスコープで状況を言語化し、AIで仮説と戦略に落とし込みます。</p>
+            <p>迷いを減らし、選択の軸を整えるための研究です。</p>
+            <ul class="tags">
+              <li>月次テーマ</li><li>意思決定</li><li>投資シナリオ</li><li>振り返り</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
 
     <footer class="full">
       <div class="inner">© いちすが研究所</div>
     </footer>
   </main>
 
-<script type="importmap">
-  {
-    "imports": {
-      "three": "https://unpkg.com/three@0.159.0/build/three.module.js",
-      "three/addons/": "https://unpkg.com/three@0.159.0/examples/jsm/"
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.159.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.159.0/examples/jsm/"
+      }
     }
-  }
-</script>
+  </script>
 
-
+  <!-- ✅ 以下のJSは原文ほぼそのまま（動作維持） -->
   <script type="module">
     import * as THREE from "three";
     import { RoomEnvironment } from "https://unpkg.com/three@0.159.0/examples/jsm/environments/RoomEnvironment.js";
@@ -1096,13 +905,11 @@
     const brandTL = document.getElementById("brandTL");
     const bgVideo = document.querySelector(".bg-video");
 
-if (bgVideo) {
-  const reveal = () => bgVideo.classList.add("is-ready");
-  bgVideo.addEventListener("playing", reveal, { once: true });
-  bgVideo.addEventListener("canplay", reveal, { once: true }); // 保険
-}
-
-
+    if (bgVideo) {
+      const reveal = () => bgVideo.classList.add("is-ready");
+      bgVideo.addEventListener("playing", reveal, { once: true });
+      bgVideo.addEventListener("canplay", reveal, { once: true });
+    }
 
     // ---------- Parallax (scroll + mouse)
     const parallaxEls = Array.from(document.querySelectorAll("[data-parallax]"));
@@ -1115,95 +922,81 @@ if (bgVideo) {
       requestAnimationFrame(updateParallax);
     }
 
-// ✅ 左上ブランドの高さに応じて、ステッカーの開始位置を下げる
-function updateSafeTop(){
-  const brand = document.getElementById("brandTL");
-  const r = brand?.getBoundingClientRect();
-  // ブランド下端 + 16px を安全領域に（上限は適当）
-  const safe = r ? Math.min(360, r.bottom + 16) : 150;
-  document.documentElement.style.setProperty("--safeTop", `${safe}px`);
-}
-updateSafeTop();
-window.addEventListener("resize", updateSafeTop, { passive:true });
+    // ✅ 左上ブランドの高さに応じて、ステッカー/トップラインの開始位置を下げる
+    function updateSafeTop(){
+      const brand = document.getElementById("brandTL");
+      const r = brand?.getBoundingClientRect();
+      const safe = r ? Math.min(360, r.bottom + 16) : 150;
+      document.documentElement.style.setProperty("--safeTop", `${safe}px`);
+    }
+    updateSafeTop();
+    window.addEventListener("resize", updateSafeTop, { passive:true });
 
-// ✅ Draggable Stickers
-const draggableStickers = Array.from(document.querySelectorAll(".sticker"));
+    // ✅ Draggable Stickers
+    const draggableStickers = Array.from(document.querySelectorAll(".sticker"));
 
-function makeStickerDraggable(el){
-  if (!el.dataset.dx) el.dataset.dx = "0";
-  if (!el.dataset.dy) el.dataset.dy = "0";
+    function makeStickerDraggable(el){
+      if (!el.dataset.dx) el.dataset.dx = "0";
+      if (!el.dataset.dy) el.dataset.dy = "0";
 
-  let startX = 0, startY = 0;
-  let baseDx = 0, baseDy = 0;
-  let activeId = null;
+      let startX = 0, startY = 0;
+      let baseDx = 0, baseDy = 0;
+      let activeId = null;
 
-  const bump = () => (typeof requestParallax === "function" ? requestParallax() : updateParallax());
+      const bump = () => (typeof requestParallax === "function" ? requestParallax() : updateParallax());
 
-  el.addEventListener("pointerdown", (e) => {
-    // ステッカーを掴んだ時に、HEROの波紋（pointerdown）を発火させない
-    e.stopPropagation();
+      el.addEventListener("pointerdown", (e) => {
+        e.stopPropagation();
+        activeId = e.pointerId;
+        el.classList.add("dragging");
+        startX = e.clientX;
+        startY = e.clientY;
+        baseDx = parseFloat(el.dataset.dx || "0");
+        baseDy = parseFloat(el.dataset.dy || "0");
+        el.setPointerCapture?.(activeId);
+        e.preventDefault();
+      });
 
-    activeId = e.pointerId;
-    el.classList.add("dragging");
+      window.addEventListener("pointermove", (e) => {
+        if (activeId === null || e.pointerId !== activeId) return;
+        const dx = baseDx + (e.clientX - startX);
+        const dy = baseDy + (e.clientY - startY);
+        el.dataset.dx = String(dx);
+        el.dataset.dy = String(dy);
+        bump();
+        e.preventDefault();
+      }, { passive:false });
 
-    startX = e.clientX;
-    startY = e.clientY;
-    baseDx = parseFloat(el.dataset.dx || "0");
-    baseDy = parseFloat(el.dataset.dy || "0");
+      window.addEventListener("pointerup", (e) => {
+        if (activeId === null || e.pointerId !== activeId) return;
+        try { el.releasePointerCapture?.(activeId); } catch {}
+        activeId = null;
+        el.classList.remove("dragging");
+        e.preventDefault();
+      }, { passive:false });
+    }
 
-    el.setPointerCapture?.(activeId);
-    e.preventDefault();
-  });
+    if (!reduceMotion) draggableStickers.forEach(makeStickerDraggable);
 
-  window.addEventListener("pointermove", (e) => {
-    if (activeId === null || e.pointerId !== activeId) return;
-
-    const dx = baseDx + (e.clientX - startX);
-    const dy = baseDy + (e.clientY - startY);
-
-    el.dataset.dx = String(dx);
-    el.dataset.dy = String(dy);
-
-    bump();
-    e.preventDefault();
-  }, { passive:false });
-
-  window.addEventListener("pointerup", (e) => {
-    if (activeId === null || e.pointerId !== activeId) return;
-
-    try { el.releasePointerCapture?.(activeId); } catch {}
-    activeId = null;
-    el.classList.remove("dragging");
-    e.preventDefault();
-  }, { passive:false });
-}
-
-if (!reduceMotion) draggableStickers.forEach(makeStickerDraggable);
-    
-
-
-
-function updateParallax(){
+    function updateParallax(){
       rafPending = false;
       const y = window.scrollY || 0;
       const mx = mouseX, my = mouseY;
 
       for (const el of parallaxEls) {
-  // ✅ ドラッグ中のステッカーはパララックスをスキップ
-  if (el.classList.contains("dragging")) continue;
+        if (el.classList.contains("dragging")) continue;
+        const s = parseFloat(el.dataset.speed || "0.2");
+        const m = parseFloat(el.dataset.mouse || "0.0");
+        const ty = y * s * -0.12;
+        const txm = mx * 30 * m;
+        const tym = my * 22 * m;
+        const dx = parseFloat(el.dataset.dx || "0");
+        const dy = parseFloat(el.dataset.dy || "0");
 
-  const s = parseFloat(el.dataset.speed || "0.2");
-  const m = parseFloat(el.dataset.mouse || "0.0");
-  const ty = y * s * -0.12;
-  const txm = mx * 30 * m;
-  const tym = my * 22 * m;
-  const dx = parseFloat(el.dataset.dx || "0");
-  const dy = parseFloat(el.dataset.dy || "0");
+        el.style.setProperty("--px", `${txm + dx}px`);
+        el.style.setProperty("--py", `${ty + tym + dy}px`);
+      }
 
-  el.style.setProperty("--px", `${txm + dx}px`);
-  el.style.setProperty("--py", `${ty + tym + dy}px`);
-}
-      // 左上ブランド・カードの光源位置
       const mxp = `${(mx + 0.5) * 100}%`;
       const myp = `${(my + 0.5) * 100}%`;
       brandTL?.style.setProperty("--mx", mxp);
@@ -1211,7 +1004,6 @@ function updateParallax(){
       heroCard?.style.setProperty("--mx", mxp);
       heroCard?.style.setProperty("--my", myp);
 
-      // ✅ 動画も“プレイアフル”に：ゆっくりズーム＋マウスで微移動
       if (bgVideo && !reduceMotion) {
         const vtx = mx * -14;
         const vty = my * -10 + y * -0.005;
@@ -1225,9 +1017,9 @@ function updateParallax(){
       hero.addEventListener("pointermove", (e) => {
         const r = hero.getBoundingClientRect();
         const x = (e.clientX - r.left) / r.width;
-        const y = (e.clientY - r.top) / r.height;
+        const yy = (e.clientY - r.top) / r.height;
         mouseX = (x - 0.5);
-        mouseY = (y - 0.5);
+        mouseY = (yy - 0.5);
         requestParallax();
       }, { passive:true });
 
@@ -1247,10 +1039,8 @@ function updateParallax(){
         if (!rect) rect = el.getBoundingClientRect();
         const x = (e.clientX - rect.left) / rect.width;
         const y = (e.clientY - rect.top) / rect.height;
-
         const rx = (0.5 - y) * 10;
         const ry = (x - 0.5) * 14;
-
         el.style.transform = `perspective(900px) rotateX(${rx}deg) rotateY(${ry}deg) translateY(-2px)`;
       };
       const onLeave = () => {
@@ -1273,7 +1063,6 @@ function updateParallax(){
         if (!r) r = btn.getBoundingClientRect();
         const x = (e.clientX - r.left) / r.width - 0.5;
         const y = (e.clientY - r.top) / r.height - 0.5;
-
         btn.style.setProperty("--mx", `${(x + 0.5) * 100}%`);
         btn.style.setProperty("--my", `${(y + 0.5) * 100}%`);
         btn.style.transform = `translate3d(${x * strength}px, ${y * strength}px, 0)`;
@@ -1290,11 +1079,7 @@ function updateParallax(){
     }
     if (!reduceMotion && !isCoarse) magnets.forEach(bindMagnet);
 
-
-
-
-
-    // ---------- Three.js 3D (センセーショナル強化 + クリック波紋)
+    // ---------- Three.js 3D（原文のまま）
     function init3D(){
       const canvas = document.getElementById("scene");
       if (!canvas || !hero) return;
@@ -1308,7 +1093,6 @@ function updateParallax(){
       const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 160);
       camera.position.set(0, 0.48, 6.3);
 
-      // env
       const pmrem = new THREE.PMREMGenerator(renderer);
       const envTex = pmrem.fromScene(new RoomEnvironment(renderer), 0.04).texture;
       scene.environment = envTex;
@@ -1320,7 +1104,6 @@ function updateParallax(){
       const orb2 = new THREE.PointLight(0x50c8ff, 0.55, 24);
       scene.add(orb1, orb2);
 
-      // aurora ribbon
       const ribbonGeo = new THREE.PlaneGeometry(18, 8, 1, 1);
       const ribbonMat = new THREE.ShaderMaterial({
         transparent: true,
@@ -1358,7 +1141,6 @@ function updateParallax(){
       ribbon.rotation.x = -0.25;
       scene.add(ribbon);
 
-      // particles
       const pCount = 1700;
       const pGeo = new THREE.BufferGeometry();
       const pos = new Float32Array(pCount * 3);
@@ -1374,7 +1156,6 @@ function updateParallax(){
       const points = new THREE.Points(pGeo, new THREE.PointsMaterial({ size: 0.014, color: 0xffffff, transparent:true, opacity: 0.40 }));
       scene.add(points);
 
-      // instanced floaters
       const instCount = 48;
       const inst = new THREE.InstancedMesh(
         new THREE.IcosahedronGeometry(0.12, 0),
@@ -1395,7 +1176,6 @@ function updateParallax(){
         w: 0.45 + Math.random()*1.25
       }));
 
-      // group + HUD rings
       const group = new THREE.Group(); scene.add(group);
       const ringMat = new THREE.MeshBasicMaterial({ color: 0x7dd3fc, transparent:true, opacity:0.18, blending: THREE.AdditiveBlending, depthWrite:false });
       const ring1 = new THREE.Mesh(new THREE.TorusGeometry(1.65, 0.01, 8, 240), ringMat);
@@ -1404,7 +1184,6 @@ function updateParallax(){
       ring2.material.color = new THREE.Color(0xa855f7); ring2.material.opacity = 0.14;
       ring2.position.set(0, 0.05, -0.25); ring2.rotation.x = Math.PI * 0.5; group.add(ring2);
 
-      // bloom
       let composer = null, bloomPass = null;
       const enableBloom = !reduceMotion && !isCoarse;
       const bloomBase = { strength: 0.55, radius: 0.35, threshold: 0.22 };
@@ -1430,7 +1209,6 @@ function updateParallax(){
       resize();
       addEventListener("resize", resize, { passive:true });
 
-      // mouse
       let mx3 = 0, my3 = 0;
       if (!reduceMotion) {
         hero.addEventListener("pointermove", (e) => {
@@ -1441,7 +1219,6 @@ function updateParallax(){
         hero.addEventListener("pointerleave", () => { mx3 = 0; my3 = 0; }, { passive:true });
       }
 
-      // click shockwaves
       const waves = [];
       const baseWaveMat = new THREE.MeshBasicMaterial({
         color: 0x50c8ff, transparent:true, opacity:0.0,
@@ -1461,7 +1238,6 @@ function updateParallax(){
       }
       hero.addEventListener("pointerdown", () => { if (!reduceMotion) spawnWave(); }, { passive:true });
 
-      // pause offscreen
       let running = true;
       const io = new IntersectionObserver((entries)=>{ running = entries[0]?.isIntersecting ?? true; }, { threshold: 0.08 });
       io.observe(hero);
@@ -1530,10 +1306,8 @@ function updateParallax(){
 
     if (!reduceMotion) init3D();
   </script>
-　<!-- Cloudflare Web Analytics -->
-　<script defer src='https://static.cloudflareinsights.com/beacon.min.js' 
-	 data-cf-beacon='{"token": "e3cfb6735d65416dbeb72507a735683e"}'></script><!-- End Cloudflare Web Analytics -->
-	
+
+  <script defer src="https://static.cloudflareinsights.com/beacon.min.js"
+    data-cf-beacon='{"token": "e3cfb6735d65416dbeb72507a735683e"}'></script>
 </body>
 </html>
-
