@@ -3,33 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>今日のおみくじ</title>
+    <meta name="theme-color" content="#101715">
+    <meta name="description" content="ひと呼吸、心を澄ませて。今日の一歩に小さなきっかけを届ける、いちすが研究所のおみくじ。">
+    <title>今日の御神籤 | いちすが研究所</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Kiwi+Maru:wght@500&family=Zen+Maru+Gothic:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;500;600&family=Noto+Sans+JP:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
 </head>
 <body>
+    <header class="site-header">
+        <a class="brand" href="../index.html" aria-label="いちすが研究所 ホーム">ICHISUGA <span>LAB.</span></a>
+        <a class="home-link" href="../index.html">研究所に戻る <span aria-hidden="true">↗</span></a>
+    </header>
+
     <main class="container">
+        <p class="eyebrow">A LITTLE SIGN, A NEW BEGINNING</p>
         <h1>今日の御神籤</h1>
-        <button id="draw-button">御籤を引く</button>
-        <a href="../index.html" class="btn" style="margin-top: 20px; text-decoration: none;">ホームに戻る</a>
-        <div id="result">
+        <p class="introduction">ひと呼吸、心を澄ませて。<br>今日のあなたに、ひとつの兆しを。</p>
+
+        <div class="invitation" aria-hidden="true">
+            <span class="invitation-ring"></span>
+            <span class="invitation-axis"></span>
+            <span class="invitation-paper"><span>御神籤</span><i>縁</i></span>
+            <span class="invitation-caption">一 日 一 縁</span>
+        </div>
+
+        <button id="draw-button" type="button"><span>お御籤を引く</span><span class="button-symbol" aria-hidden="true">↗</span></button>
+        <p class="draw-note">小さなきっかけを、今日の一歩に。</p>
+
+        <section id="result" aria-labelledby="fortune-heading" hidden>
             <div class="scroll-content-wrapper">
-                <div class="scroll-content">
-                    <!-- Fortune content will be injected here -->
+                <div class="scroll-content"></div>
+            </div>
+        </section>
+        <noscript><p class="noscript-message">おみくじを引くには、ブラウザーのJavaScriptを有効にしてください。</p></noscript>
+    </main>
+
+    <footer class="site-footer"><span>いちすが研究所</span><span>PAUSE. BREATHE. BEGIN.</span></footer>
+
+    <dialog id="animation-container" aria-labelledby="ritual-title" aria-describedby="ritual-status">
+        <div class="ritual-layout">
+            <div class="ritual-topline" aria-hidden="true"><span>ICHISUGA LAB.</span><span>御神籤 / OMIKUJI</span></div>
+
+            <div class="ritual-main">
+                <p class="eyebrow ritual-eyebrow">A MOMENT OF STILLNESS</p>
+                <h2 id="ritual-title">静寂に、ひとつの兆し。</h2>
+
+                <div class="ritual-scene" aria-hidden="true">
+                    <div class="ritual-aura"></div>
+                    <div class="ritual-axis"></div>
+                    <svg class="ritual-halo" viewBox="0 0 400 400" fill="none">
+                        <circle class="halo-outer" cx="200" cy="200" r="184" />
+                        <circle class="halo-dashes" cx="200" cy="200" r="174" />
+                        <circle class="halo-inner" cx="200" cy="200" r="150" />
+                        <circle class="halo-arc" cx="200" cy="200" r="150" pathLength="100" />
+                        <path class="halo-points" d="M200 4v18m0 356v18M4 200h18m356 0h18M67 67l9 9m248 248 9 9M67 333l9-9M324 76l9-9" />
+                        <path class="halo-diamond" d="m200 8 4 8-4 8-4-8zM376 200l8-4 8 4-8 4zM200 376l4 8-4 8-4-8zM8 200l8-4 8 4-8 4z" />
+                    </svg>
+                    <div class="ritual-particles">
+                        <i style="--x:18%;--y:32%;--delay:0s"></i><i style="--x:76%;--y:20%;--delay:.4s"></i>
+                        <i style="--x:86%;--y:63%;--delay:.8s"></i><i style="--x:23%;--y:77%;--delay:.2s"></i>
+                        <i style="--x:57%;--y:10%;--delay:.6s"></i><i style="--x:66%;--y:86%;--delay:1s"></i>
+                        <i style="--x:8%;--y:56%;--delay:.3s"></i><i style="--x:89%;--y:39%;--delay:.7s"></i>
+                    </div>
+                    <div class="ritual-core"><span></span></div>
+                    <div class="ritual-paper">
+                        <span class="paper-crest">✦</span>
+                        <span class="paper-title">御神籤</span>
+                        <span class="paper-rule"></span>
+                        <span class="paper-seal">縁</span>
+                        <span class="paper-foot">一 日 一 縁</span>
+                    </div>
+                    <span class="scene-label scene-label-left">心を澄ます</span>
+                    <span class="scene-label scene-label-right">縁をむすぶ</span>
+                </div>
+
+                <div class="ritual-caption">
+                    <p id="ritual-status" role="status" aria-live="polite" aria-atomic="true">ひと呼吸、心を澄ませて。</p>
+                    <div class="ritual-progress" aria-hidden="true"><span></span></div>
+                    <p class="ritual-step" aria-hidden="true">01 <span>—</span> 03</p>
                 </div>
             </div>
-        </div>
-    </main>
-    <script src="script.js"></script>
 
-    <!-- Animation Elements -->
-    <div id="animation-container" class="hidden">
-        <div id="omikuji-box">
-            <div id="omikuji-stick"></div>
-            <span class="fortune-char">おみくじ</span>
+            <div class="ritual-bottomline"><span aria-hidden="true">その一枚が、今日のきっかけに。</span><button id="skip-animation" type="button" autofocus>演出をスキップ <span aria-hidden="true">↗</span></button></div>
         </div>
-    </div>
+    </dialog>
 </body>
 </html>
