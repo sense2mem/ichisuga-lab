@@ -3,7 +3,36 @@ document.addEventListener('DOMContentLoaded', () => {
     const resultElement = document.getElementById('result');
     const scrollContentElement = resultElement.querySelector('.scroll-content');
     const animationContainer = document.getElementById('animation-container');
-    const omikujiBox = document.getElementById('omikuji-box');
+    const skipButton = document.getElementById('skip-animation');
+    const ritualStatus = document.getElementById('ritual-status');
+    const ritualStep = animationContainer.querySelector('.ritual-step');
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const pendingTimers = new Set();
+    let isDrawing = false;
+
+    function later(callback, delay) {
+        const timer = window.setTimeout(() => {
+            pendingTimers.delete(timer);
+            callback();
+        }, delay);
+        pendingTimers.add(timer);
+    }
+
+    function finishDraw() {
+        if (!isDrawing) return;
+        pendingTimers.forEach(timer => window.clearTimeout(timer));
+        pendingTimers.clear();
+        if (animationContainer.open) animationContainer.close();
+        animationContainer.className = '';
+        document.body.classList.remove('is-drawing');
+        resultElement.removeAttribute('aria-busy');
+        drawFortune();
+        drawButton.disabled = false;
+        drawButton.querySelector('span').textContent = 'もう一度引く';
+        isDrawing = false;
+        document.getElementById('fortune-heading').focus({ preventScroll: true });
+        resultElement.scrollIntoView({ block: 'start', behavior: 'instant' });
+    }
 
     // 各運勢の詳細データ
     const fortuneTemplates = {
@@ -91,46 +120,52 @@ document.addEventListener('DOMContentLoaded', () => {
         ...Array(1).fill('大凶')     // 0.5%
     ];
 
-drawButton.addEventListener('click', function() {
-  drawButton.disabled = true;
-  resultElement.classList.remove('visible');
+    drawButton.addEventListener('click', () => {
+        if (isDrawing) return;
+        isDrawing = true;
+        drawButton.disabled = true;
+        resultElement.hidden = true;
+        resultElement.classList.remove('visible');
+        resultElement.setAttribute('aria-busy', 'true');
 
-  // 初期化
-  animationContainer.classList.remove('hidden', 'phase2');
-  omikujiBox.classList.remove('shaking', 'tilting');
+        // Respect the visitor's motion preference without an artificial wait.
+        if (reducedMotion.matches || typeof animationContainer.showModal !== 'function') {
+            finishDraw();
+            return;
+        }
 
-  // 表示 & Phase1開始（呼吸＋浮遊）
-  requestAnimationFrame(() => {
-    animationContainer.classList.add('visible');
-    omikujiBox.classList.add('shaking');
-  });
+        document.body.classList.add('is-drawing');
+        ritualStatus.textContent = 'ひと呼吸、心を澄ませて。';
+        ritualStep.innerHTML = '01 <span>—</span> 03';
+        animationContainer.className = 'is-playing';
+        animationContainer.showModal();
 
-  const TRIGGER = 1000;   // 8秒で覚醒
-  const END     = 4500;  // 紙が出て余韻→終了（好みで調整OK）
+        later(() => {
+            animationContainer.classList.add('is-gathering');
+            ritualStatus.textContent = '小さな光が、縁をむすぶ。';
+            ritualStep.innerHTML = '02 <span>—</span> 03';
+        }, 1300);
 
-  // 8秒後：Phase2（光バースト＋棒＋紙）
-  setTimeout(() => {
-    animationContainer.classList.add('phase2');
-    omikujiBox.classList.remove('shaking');
-    omikujiBox.classList.add('tilting');
-  }, TRIGGER);
+        later(() => {
+            animationContainer.classList.add('is-revealing');
+            ritualStatus.textContent = '今日のあなたに、ひとつの兆し。';
+            ritualStep.innerHTML = '03 <span>—</span> 03';
+        }, 2600);
 
-  // 終了：結果表示へ
-  setTimeout(() => {
-    animationContainer.classList.remove('visible');
-    omikujiBox.classList.remove('tilting');
+        later(() => {
+            animationContainer.classList.add('is-leaving');
+            later(finishDraw, 400);
+        }, 4400);
+    });
 
-    drawFortune();
-    drawButton.disabled = false;
-
-    setTimeout(() => {
-      animationContainer.classList.add('hidden');
-      animationContainer.classList.remove('phase2');
-      omikujiBox.classList.remove('shaking', 'tilting');
-    }, 600);
-  }, END);
-});
-
+    skipButton.addEventListener('click', finishDraw);
+    animationContainer.addEventListener('cancel', event => {
+        event.preventDefault();
+        finishDraw();
+    });
+    reducedMotion.addEventListener('change', event => {
+        if (event.matches && isDrawing) finishDraw();
+    });
 
     function drawFortune() {
         // くじ箱からランダムに運勢レベルを1つ選ぶ
@@ -149,16 +184,20 @@ drawButton.addEventListener('click', function() {
         // 結果を表示するためのHTMLを生成
         let detailsHtml = '<ul class="details-list">';
         for (const [key, value] of Object.entries(finalDetails)) {
-            detailsHtml += `<li><span>${key}</span>: ${value}</li>`;
+            detailsHtml += `<li><span class="detail-label">${key}</span><span>${value}</span></li>`;
         }
         detailsHtml += '</ul>';
 
         scrollContentElement.innerHTML = `
-            <div class="fortune-level">${randomLevel}</div>
+            <p class="result-eyebrow">今日のあなたへの御神籤</p>
+            <h2 id="fortune-heading" class="fortune-level" tabindex="-1">${randomLevel}</h2>
             ${detailsHtml}
+            <p class="result-signoff">よき一日と、なりますように。</p>
         `;
 
         // 結果カードを表示
+        document.body.classList.add('has-result');
+        resultElement.hidden = false;
         resultElement.classList.add('visible');
     }
 });
