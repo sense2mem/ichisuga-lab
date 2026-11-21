@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const animationContainer = document.getElementById('animation-container');
     const skipButton = document.getElementById('skip-animation');
     const ritualStatus = document.getElementById('ritual-status');
-    const ritualStep = animationContainer.querySelector('.ritual-step');
+    const ritualStep = animationContainer.querySelector('.step-current');
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
     const pendingTimers = new Set();
     let isDrawing = false;
@@ -136,20 +136,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
         document.body.classList.add('is-drawing');
         ritualStatus.textContent = 'ひと呼吸、心を澄ませて。';
-        ritualStep.innerHTML = '01 <span>—</span> 03';
+        ritualStep.textContent = '01';
         animationContainer.className = 'is-playing';
         animationContainer.showModal();
 
         later(() => {
             animationContainer.classList.add('is-gathering');
             ritualStatus.textContent = '小さな光が、縁をむすぶ。';
-            ritualStep.innerHTML = '02 <span>—</span> 03';
+            ritualStep.textContent = '02';
         }, 1300);
 
         later(() => {
             animationContainer.classList.add('is-revealing');
             ritualStatus.textContent = '今日のあなたに、ひとつの兆し。';
-            ritualStep.innerHTML = '03 <span>—</span> 03';
+            ritualStep.textContent = '03';
         }, 2600);
 
         later(() => {
@@ -174,26 +174,19 @@ document.addEventListener('DOMContentLoaded', () => {
         // 選ばれた運勢のテンプレートを取得
         const fortuneTemplate = fortuneTemplates[randomLevel];
 
-        // 各項目からランダムに1つずつコメントを選んで、最終的な結果を作成
-        const finalDetails = {};
-        for (const [key, valueArray] of Object.entries(fortuneTemplate.details)) {
-            const randomIndex = Math.floor(Math.random() * valueArray.length);
-            finalDetails[key] = valueArray[randomIndex];
+        scrollContentElement.querySelector('.fortune-level').textContent = randomLevel;
+        const list = scrollContentElement.querySelector('.details-list');
+        list.replaceChildren();
+        for (const [label, messages] of Object.entries(fortuneTemplate.details)) {
+            const item = document.createElement('li');
+            const term = document.createElement('span');
+            term.className = 'detail-label';
+            term.textContent = label;
+            const message = document.createElement('span');
+            message.textContent = messages[Math.floor(Math.random() * messages.length)];
+            item.append(term, message);
+            list.append(item);
         }
-
-        // 結果を表示するためのHTMLを生成
-        let detailsHtml = '<ul class="details-list">';
-        for (const [key, value] of Object.entries(finalDetails)) {
-            detailsHtml += `<li><span class="detail-label">${key}</span><span>${value}</span></li>`;
-        }
-        detailsHtml += '</ul>';
-
-        scrollContentElement.innerHTML = `
-            <p class="result-eyebrow">今日のあなたへの御神籤</p>
-            <h2 id="fortune-heading" class="fortune-level" tabindex="-1">${randomLevel}</h2>
-            ${detailsHtml}
-            <p class="result-signoff">よき一日と、なりますように。</p>
-        `;
 
         // 結果カードを表示
         document.body.classList.add('has-result');

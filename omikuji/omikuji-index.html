@@ -2,13 +2,12 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; base-uri 'none'; object-src 'none'; form-action 'none'; img-src 'self'; style-src 'self'; font-src 'self'; script-src 'self'; connect-src 'none'">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#101715">
+    <meta name="theme-color" content="#f4f0e5">
     <meta name="description" content="ひと呼吸、心を澄ませて。今日の一歩に小さなきっかけを届ける、いちすが研究所のおみくじ。">
     <title>今日の御神籤 | いちすが研究所</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;500;600&family=Noto+Sans+JP:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <script src="script.js" defer></script>
 </head>
@@ -35,7 +34,12 @@
 
         <section id="result" aria-labelledby="fortune-heading" hidden>
             <div class="scroll-content-wrapper">
-                <div class="scroll-content"></div>
+                <div class="scroll-content">
+                    <p class="result-eyebrow">今日のあなたへの御神籤</p>
+                    <h2 id="fortune-heading" class="fortune-level" tabindex="-1"></h2>
+                    <ul class="details-list"></ul>
+                    <p class="result-signoff">よき一日と、なりますように。</p>
+                </div>
             </div>
         </section>
         <noscript><p class="noscript-message">おみくじを引くには、ブラウザーのJavaScriptを有効にしてください。</p></noscript>
@@ -63,10 +67,10 @@
                         <path class="halo-diamond" d="m200 8 4 8-4 8-4-8zM376 200l8-4 8 4-8 4zM200 376l4 8-4 8-4-8zM8 200l8-4 8 4-8 4z" />
                     </svg>
                     <div class="ritual-particles">
-                        <i style="--x:18%;--y:32%;--delay:0s"></i><i style="--x:76%;--y:20%;--delay:.4s"></i>
-                        <i style="--x:86%;--y:63%;--delay:.8s"></i><i style="--x:23%;--y:77%;--delay:.2s"></i>
-                        <i style="--x:57%;--y:10%;--delay:.6s"></i><i style="--x:66%;--y:86%;--delay:1s"></i>
-                        <i style="--x:8%;--y:56%;--delay:.3s"></i><i style="--x:89%;--y:39%;--delay:.7s"></i>
+                        <i></i><i></i>
+                        <i></i><i></i>
+                        <i></i><i></i>
+                        <i></i><i></i>
                     </div>
                     <div class="ritual-core"><span></span></div>
                     <div class="ritual-paper">
@@ -83,7 +87,7 @@
                 <div class="ritual-caption">
                     <p id="ritual-status" role="status" aria-live="polite" aria-atomic="true">ひと呼吸、心を澄ませて。</p>
                     <div class="ritual-progress" aria-hidden="true"><span></span></div>
-                    <p class="ritual-step" aria-hidden="true">01 <span>—</span> 03</p>
+                    <p class="ritual-step" aria-hidden="true"><span class="step-current">01</span> <span class="step-divider">—</span> 03</p>
                 </div>
             </div>
 

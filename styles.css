@@ -10,7 +10,7 @@
 }
 *, *::before, *::after { box-sizing: border-box; }
 html { scroll-behavior: smooth; scroll-padding-top: 112px; }
-body { margin: 0; background: var(--ink); color: var(--paper); font-family: "Manrope", "Noto Sans JP", sans-serif; font-size: 1rem; line-height: 1.9; -webkit-font-smoothing: antialiased; }
+body { margin: 0; background: var(--ink); color: var(--paper); font-family: system-ui, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif; font-size: 1rem; line-height: 1.9; -webkit-font-smoothing: antialiased; }
 ::selection { background: #aac4ff; color: var(--ink); }
 a { color: inherit; text-decoration: none; }
 button { color: inherit; font: inherit; }
@@ -31,7 +31,7 @@ h1, h2, h3, p, figure { margin: 0; }
 .brand-symbol span { font-size: 2.2rem; margin-top: 9px; }
 .brand-name { min-width: 0; overflow-wrap: anywhere; font-weight: 800; font-size: 1.15rem; letter-spacing: -.03em; }
 .brand-name > span { margin-left: 5px; color: var(--sky); }
-.brand-name small { display: block; font-family: "Noto Sans JP",sans-serif; margin-top: 9px; font-size: .75rem; font-weight: 500; letter-spacing: .12em; }
+.brand-name small { display: block; font-family: system-ui,sans-serif; margin-top: 9px; font-size: .75rem; font-weight: 500; letter-spacing: .12em; }
 .site-nav { display: flex; align-items: center; gap: 28px; }
 .site-nav a { font-size: .875rem; font-weight: 500; padding-block: 12px; transition: color .2s; }
 .site-nav a:hover { color: var(--sky); }
@@ -45,7 +45,7 @@ h1, h2, h3, p, figure { margin: 0; }
 .hero-topline { font-size: .75rem; letter-spacing: .12em; color: var(--muted); }
 .hero-grid { display: grid; grid-template-columns: minmax(0,1.1fr) minmax(0,1fr); gap: 26px; align-items: center; padding: 54px 0 65px; }
 .eyebrow { color: var(--sky); font-size: .8125rem; font-weight: 700; letter-spacing: .14em; margin-bottom: 23px; }
-.hero h1 { font-family: "Noto Sans JP",sans-serif; font-weight: 800; font-size: clamp(2.6rem,5.2vw,4.55rem); line-height: 1.43; letter-spacing: -.045em; }
+.hero h1 { font-family: system-ui,sans-serif; font-weight: 800; font-size: clamp(2.6rem,5.2vw,4.55rem); line-height: 1.43; letter-spacing: -.045em; }
 .hero h1 > span { color: var(--sky); }
 .hero-description { margin-top: 28px; font-size: 1rem; color: #bdc3cf; line-height: 2; }
 .button { min-height: 56px; max-width: 100%; display: inline-flex; align-items: center; justify-content: space-between; gap: clamp(14px,3vw,46px); padding: 14px 24px; border: 1px solid transparent; border-radius: 4px; font-size: .9375rem; font-weight: 700; transition: background .2s,transform .2s; }
@@ -132,6 +132,61 @@ h1, h2, h3, p, figure { margin: 0; }
 .footer-bottom small { font-size: inherit; }
 .footer-bottom > span { letter-spacing: .08em; }
 
+/* Paper, ink and a blue orbital plate echo a printed research journal. */
+:root {
+  --serif: "Yu Mincho", "Hiragino Mincho ProN", "Noto Serif CJK JP", serif;
+  --paper: #f7f6ed;
+  --blue: #253aba;
+}
+.site-header, .hero { background: var(--paper); color: #151c29; color-scheme: light; }
+.site-header { border-color: #c9c8ba; }
+.header-inner { min-height: 78px; }
+.brand-symbol, .hero h1 > span, .site-nav a:hover { color: var(--blue); }
+.hero { padding-top: 30px; }
+.hero-topline, .hero-bottom { color: #505565; font-family: ui-monospace, monospace; }
+.hero-grid { grid-template-columns: 1fr 1fr; gap: clamp(24px, 4vw, 70px); }
+.hero h1 { font-family: var(--serif); font-size: clamp(2.8rem, 5.4vw, 5.65rem); line-height: 1.34; }
+.hero .eyebrow { color: var(--blue); }
+.hero-description { color: #414653; }
+.button-light { background: var(--blue); color: white; border-radius: 100px; }
+.button-light:hover { background: #162980; }
+.hero-bottom { border-color: #c9c8ba; }
+.hero-bottom a:hover, .hero-bottom a span { color: var(--blue); }
+.hero-visual {
+  isolation: isolate;
+  justify-content: center;
+  min-height: 430px;
+  border: 0;
+  border-radius: 48% 48% 3px 3px;
+  background: radial-gradient(ellipse at 52% 35%, #37497d, #142944 44%, #0c182a 80%);
+}
+.orbital-field {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle, #bfcef05c .9px, transparent 1px);
+  background-size: 19px 19px;
+}
+.orbital-field::before, .orbital-field::after {
+  content: "";
+  position: absolute;
+  inset: 18% 7%;
+  border: 1px solid #aac5ff63;
+  border-radius: 50%;
+  transform: rotate(-29deg);
+}
+.orbital-field::after { inset: 10% 24%; transform: rotate(34deg); }
+.hero-visual img { position: relative; z-index: 1; }
+.hero-visual figcaption { position: absolute; bottom: 0; color: #f1f2ff; }
+.hero-visual figcaption br { display: none; }
+.statement { font-family: Georgia, var(--serif); font-style: italic; }
+.research h2, .research-name h3, .contact h2 { font-family: var(--serif); }
+@media (min-width: 901px) {
+  .research-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+  .research-row { display: flex; flex-direction: column; gap: 22px; padding: 23px 0; border-top: 2px solid var(--blue); }
+  .research-row:last-child { border-bottom: 0; }
+  .research-number { font-family: Georgia, serif; font-style: italic; }
+}
+
 @media (min-width: 1600px) { .hero-grid { padding-top: 66px; padding-bottom: 80px; } }
 @media (max-width: 1100px) {
   .container { width: calc(100% - 64px); }
@@ -192,7 +247,7 @@ h1, h2, h3, p, figure { margin: 0; }
   .hero h1 { font-size: clamp(2.3rem,9.5vw,3.7rem); line-height: 1.5; letter-spacing: -.035em; }
   .hero-description { margin-top: 22px; line-height: 1.95; }
   .button-light { margin-top: 26px; }
-  .hero-visual { min-height: 0; }
+  .hero-visual { min-height: 265px; }
   .hero-visual img { max-height: 245px; }
   .visual-top { padding: 18px 20px; }
   .hero-visual figcaption { padding: 17px 20px; }
